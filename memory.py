@@ -39,9 +39,10 @@ class Memory:
         return utils.embeddings.cosine_similarity(self.embedding, query_embedding)
 
     def relevance(self, query: str) -> float:
+        # TODO: Rework recency to be based on last_accessed order instead of time. As of now, recency is disabled.
         return (IMPORTANCE_WEIGHT * self.importance
                 + SIMILARITY_WEIGHT * self.similarity(query)
-                + RECENCY_WEIGHT * self.recency)
+                )  # + RECENCY_WEIGHT * self.recency)
 
 
 class RelatedMemory:

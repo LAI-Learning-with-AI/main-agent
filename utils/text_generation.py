@@ -1,4 +1,6 @@
-from langchain.chat_models import ChatOpenAI
+# from langchain.chat_models import ChatOpenAI
+# from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
@@ -12,8 +14,8 @@ def generate(input_str):
     prompt = PromptTemplate.from_template("{input_str}")
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7, max_tokens=1024)
     chain = LLMChain(prompt=prompt, llm=llm)
-    message = chain.run(input_str)
-    return message.strip()
+    message = chain.invoke(input_str)
+    return message["text"].strip()
 
 
 def get_rating(x):

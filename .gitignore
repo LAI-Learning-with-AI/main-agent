@@ -12,3 +12,5 @@ utils/__pycache__/__init__.cpython-311.pyc
 utils/__pycache__/embeddings.cpython-311.pyc
 utils/__pycache__/text_generation.cpython-311.pyc
 utils/__init__.py
+/.idea/main-agent.iml
+/.idea/vcs.xml
