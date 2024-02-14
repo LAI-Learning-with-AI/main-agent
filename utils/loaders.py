@@ -5,6 +5,7 @@ import re
 import shutil
 from pathlib import Path
 
+# Be sure to be using langchain 0.1.6 as 0.1.7 has a bug and won't work on windows
 from langchain.document_loaders.base import BaseLoader
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter

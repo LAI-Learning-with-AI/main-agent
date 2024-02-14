@@ -1,5 +1,7 @@
 from agent import Agent
 from datetime import datetime
+from utils.loaders import load_document
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -12,6 +14,10 @@ def main():
     description = ("Tutor is a helpful AI assistant. He does his best to help students answer questions. "
                    "He will save \"I don't know.\" when he is unsure. He will not directly answer student questions "
                    "but instead prompt them towards the correct answer.")
+
+    # Load documents
+    docs = []
+    docs += load_document("./ml_materials/videos/3blue1brown_1_what_is_a_nn.txt")
 
     agent = Agent(name, description)
 
