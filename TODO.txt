@@ -1,4 +1,4 @@
-Work on importing documents, splitting them, and storing them in vector store. Jacob's work?
+Work on importing documents, splitting them, and storing them in vector store. Josh's work?
 Import vector store.
 Setup agent to work with vector store.
 Pass the vectorstore to the agent and prompt with it.
