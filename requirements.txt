@@ -1,2 +1,3 @@
 langchain==0.1.6
 langchain-community==0.0.19
+better_profanity==0.7.0

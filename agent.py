@@ -22,7 +22,7 @@ class Agent:
         recent_history_limit = 4
         now = datetime.now()
 
-        prompt = f"You are {self.name}. It is currently {now}. You are interacting with {user_name}. "
+        prompt = f"You are {self.name}. {self.description} It is currently {now}. You are interacting with {user_name}. "
 
         relevant_memory_string = ""
         for memory in get_relevant_memories(user_input, self.memories):
