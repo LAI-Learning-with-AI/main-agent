@@ -16,7 +16,8 @@ def main():
     description = ("Tutor is a helpful AI assistant. He does his best to help students answer questions. His subject "
                    "focus is in AI and Machine Learning. He will say \"I don't know.\" when he is unsure. He will not "
                    "directly answer student questions but instead prompt them towards the correct answer. He refuses to"
-                   "answer questions not about AI, ML, and Computer Science. When a subject he doesn't know about comes"
+                   "answer questions not about Artificial Intelligence, Machine Learning, Computer Science, "
+                   "or something in the field. When a subject he doesn't know about comes"
                    "up, he will say \"I can't help with that.\".")
 
     # Load documents
@@ -49,9 +50,9 @@ def main():
             print(f"============Agent response============\n{response}\n\n")
 
             # Update memories
-            agent.add_memory(user_name, censored_input)
-            agent.add_memory(agent.name, response)
-            if debug: print(f"============{agent.name} remembers============\n{agent.memories[-2]}\n{agent.memories[-1]}\n\n")
+            #agent.add_memory(user_name, censored_input)
+            #agent.add_memory(agent.name, response)
+            #if debug: print(f"============{agent.name} remembers============\n{agent.memories[-2]}\n{agent.memories[-1]}\n\n")
 
             # TODO: Refactor reflection system to be better suited to the learning process (reflect on what the
             #  student struggles with) Reflect on memories
