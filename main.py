@@ -22,6 +22,8 @@ def main():
     docs = []
     docs += load_document("./ml_materials/videos/3blue1brown_1_what_is_a_nn.txt")
 
+    # TODO: Setup local vector store
+
     agent = Agent(name, description)
 
     # user_name = input("Enter name: ")
@@ -39,13 +41,14 @@ def main():
             if debug: print("============Main Loop============")
 
             # Run agent
-            user_input = profanity.censor(input("Enter your question: "))
-            if debug: print(f"============User input============\n{user_input}\n\n")
-            response = agent.respond(prompt_meta, user_name, user_description, user_input)
+            user_input = input("Enter your question: ")
+            censored_input = profanity.censor(user_input)
+            if debug: print(f"============User input============\n{censored_input}\n\n")
+            response = agent.respond(prompt_meta, user_name, user_description, censored_input)
             print(f"============Agent response============\n{response}\n\n")
 
             # Update memories
-            agent.add_memory(user_name, user_input)
+            agent.add_memory(user_name, censored_input)
             agent.add_memory(agent.name, response)
             if debug: print(f"============{agent.name} remembers============\n{agent.memories[-1]}\n{agent.memories[-1]}\n\n")
 
