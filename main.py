@@ -12,6 +12,7 @@ def main():
 
     name = "Tutor"
     # TODO: Figure out answer in backend first, then begin the helping process
+    # TODO: Consider putting description in plain-text config file so it is easier to change
     description = ("Tutor is a helpful AI assistant. He does his best to help students answer questions. His subject "
                    "focus is in AI and Machine Learning. He will say \"I don't know.\" when he is unsure. He will not "
                    "directly answer student questions but instead prompt them towards the correct answer. He refuses to"
@@ -50,7 +51,7 @@ def main():
             # Update memories
             agent.add_memory(user_name, censored_input)
             agent.add_memory(agent.name, response)
-            if debug: print(f"============{agent.name} remembers============\n{agent.memories[-1]}\n{agent.memories[-1]}\n\n")
+            if debug: print(f"============{agent.name} remembers============\n{agent.memories[-2]}\n{agent.memories[-1]}\n\n")
 
             # TODO: Refactor reflection system to be better suited to the learning process (reflect on what the
             #  student struggles with) Reflect on memories
