@@ -1,4 +1,4 @@
-from utils.text_generation import generate, get_rating
+from utils.text_generation import generate, get_rating, generate_with_docs
 from datetime import datetime
 from memory import *
 from utils.embeddings import *
@@ -34,6 +34,29 @@ class Agent:
 
         prompt += f"{user_name}: {user_input}\nResponse: "
         response = generate(prompt_meta.format(prompt))
+
+        if debug: print(f"============Agent Prompt============\n{prompt}\n\n")
+
+        self.history.append(f"{user_name}: {user_input}")
+        self.history.append(f"{self.name}: {response}")
+        return response
+
+    def respond_with_docs(self, prompt_meta, user_name, user_description, user_input, retriever):
+        recent_history_limit = 4
+        now = datetime.now()
+
+        prompt = f"You are {self.name}. {self.description} It is currently {now}. You are interacting with {user_name}. "
+
+        relevant_memory_string = ""
+        for memory in get_relevant_memories(user_input, self.memories):
+            relevant_memory_string += str(memory)
+
+        prompt += f"Consider the following relevant memories: {relevant_memory_string}.\n"
+
+        # prompt += f" You know the following about {user_name}: {user_description}"
+
+        prompt += f"{user_name}: {user_input}\nResponse: "
+        response = generate_with_docs(prompt_meta.format(prompt), retriever)
 
         if debug: print(f"============Agent Prompt============\n{prompt}\n\n")
 

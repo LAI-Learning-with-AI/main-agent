@@ -1,7 +1,9 @@
 from agent import Agent
-from datetime import datetime
-from utils.loaders import load_document
+# from datetime import datetime
+# from utils.loaders import load_document
 from better_profanity import profanity
+from utils.vectorstore import load_vectorstore
+import os
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -20,11 +22,15 @@ def main():
                    "or something in the field. When a subject he doesn't know about comes"
                    "up, he will say \"I can't help with that.\".")
 
-    # Load documents
-    docs = []
-    docs += load_document("./ml_materials/videos/3blue1brown_1_what_is_a_nn.txt")
-
-    # TODO: Setup local vector store
+    # Load Vector Store
+    vectorstore = load_vectorstore(database="corpus", password=os.getenv("POSTGRESQL_PASSWORD"))
+    #vectorstore.create_collection()
+    from sqlalchemy.orm import Session
+    with Session(vectorstore._bind) as session:
+        collection = vectorstore.get_collection(session)
+        print(collection)
+    search_result = vectorstore.search("AI", "similarity")
+    retriever = vectorstore.as_retriever()
 
     agent = Agent(name, description)
 
@@ -46,7 +52,10 @@ def main():
             user_input = input("Enter your question: ")
             censored_input = profanity.censor(user_input)
             if debug: print(f"============User input============\n{censored_input}\n\n")
-            response = agent.respond(prompt_meta, user_name, user_description, censored_input)
+            # response = agent.respond(prompt_meta, user_name, user_description, censored_input)
+            if debug: print(f"============Relevant Docs============\n{retriever.get_relevant_documents(censored_input)}\n\n")
+            return
+            response = agent.respond_with_docs(prompt_meta, user_name, user_description, censored_input, retriever)
             print(f"============Agent response============\n{response}\n\n")
 
             # Update memories
