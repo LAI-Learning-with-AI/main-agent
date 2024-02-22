@@ -23,12 +23,7 @@ def main():
                    "up, he will say \"I can't help with that.\".")
 
     # Load Vector Store
-    vectorstore = load_vectorstore(database="corpus", password=os.getenv("POSTGRESQL_PASSWORD"))
-    #vectorstore.create_collection()
-    from sqlalchemy.orm import Session
-    with Session(vectorstore._bind) as session:
-        collection = vectorstore.get_collection(session)
-        print(collection)
+    vectorstore = load_vectorstore(database="corpus", password=os.getenv("POSTGRESQL_PASSWORD"), collection_name="Goodfellow Deep Learning 2016")
     search_result = vectorstore.search("AI", "similarity")
     retriever = vectorstore.as_retriever()
 
@@ -54,9 +49,11 @@ def main():
             if debug: print(f"============User input============\n{censored_input}\n\n")
             # response = agent.respond(prompt_meta, user_name, user_description, censored_input)
             if debug: print(f"============Relevant Docs============\n{retriever.get_relevant_documents(censored_input)}\n\n")
-            return
-            response = agent.respond_with_docs(prompt_meta, user_name, user_description, censored_input, retriever)
-            print(f"============Agent response============\n{response}\n\n")
+
+            response_docs = agent.respond_with_docs(prompt_meta, user_name, user_description, censored_input, retriever)
+            response = agent.respond(prompt_meta, user_name, user_description, censored_input)
+            print(f"============Agent Response============\n{response}\n\n")
+            print(f"============Agent Response w/Docs============\n{response_docs}\n\n")
 
             # Update memories
             #agent.add_memory(user_name, censored_input)
