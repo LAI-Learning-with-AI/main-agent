@@ -25,8 +25,7 @@ def main():
     # Load Vector Store
     vectorstore = load_vectorstore(database="corpus", password=os.getenv("POSTGRESQL_PASSWORD"), collection_name="Goodfellow Deep Learning 2016")
     search_result = vectorstore.search("AI", "similarity")
-    #retriever = vectorstore.as_retriever()
-    retriever = None
+    retriever = vectorstore.as_retriever()
 
     agent = Agent(name, description)
 
@@ -52,11 +51,11 @@ def main():
             if debug: print(f"============User input============\n{censored_input}\n\n")
             # if debug: print(f"============Relevant Docs============\n{retriever.get_relevant_documents(censored_input)}\n\n")
 
-            #response_docs = agent.respond_with_docs(prompt_meta, user_name, user_description, censored_input, retriever)
-            #response_base = agent.respond(prompt_meta, user_name, user_description, censored_input)
+            # response_docs = agent.respond_with_docs(prompt_meta, user_name, user_description, censored_input, retriever)
+            # response_base = agent.respond(prompt_meta, user_name, user_description, censored_input)
             response_docs_and_history = agent.respond_with_docs_and_history(system_prompt, user_name, user_description, censored_input, retriever)
-            #print(f"============Agent Response============\n{response_base}\n\n")
-            #print(f"============Agent Response w/Docs============\n{response_docs}\n\n")
+            # print(f"============Agent Response============\n{response_base}\n\n")
+            # print(f"============Agent Response w/Docs============\n{response_docs}\n\n")
             print(f"============Agent Response w/Docs&History============\n{response_docs_and_history}\n\n")
 
             # Update memories

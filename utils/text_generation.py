@@ -17,11 +17,11 @@ load_dotenv()
 
 def generate(input_str, system_prompt=None, chat_history_func=None, retriever=None):
     if chat_history_func and retriever:
-        return generate_with_docs_and_history(input_str, retriever, chat_history_func)
+        return generate_with_docs_and_history(input_str, system_prompt, retriever, chat_history_func)
     elif chat_history_func:
         return generate_with_history(input_str, system_prompt, chat_history_func)
     elif retriever:
-        return generate_with_docs(input_str, retriever)
+        return generate_with_docs(input_str, system_prompt, retriever)
     else:
         return generate_base(input_str)
 
@@ -34,18 +34,16 @@ def generate_base(input_str):
     return message["text"].strip()
 
 
-def generate_with_docs(input_str, retriever):
-    # prompt = PromptTemplate.from_template("{context} {input_str}")
+def generate_with_docs(input_str, system_prompt, retriever):
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7, max_tokens=1024)
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
     combine_docs_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)
     retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
-    message = retrieval_chain.invoke({"input": input_str})
+    message = retrieval_chain.invoke({"input": input_str, "context": system_prompt})
     return message['answer'].strip()
 
 
 def generate_with_history(input_str, system_prompt, chat_history_func):
-    # prompt = PromptTemplate.from_template("{input}")
     prompt = ChatPromptTemplate.from_messages([("system", system_prompt),
                                                MessagesPlaceholder(variable_name="history"),
                                                ("human", "{input}")])
@@ -57,14 +55,14 @@ def generate_with_history(input_str, system_prompt, chat_history_func):
     return message['text'].strip()
 
 
-def generate_with_docs_and_history(input_str, retriever, chat_history_func):
+def generate_with_docs_and_history(input_str, system_prompt, retriever, chat_history_func):
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7, max_tokens=1024)
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
     combine_docs_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)
     retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
     with_message_history = RunnableWithMessageHistory(retrieval_chain, chat_history_func, input_messages_key='input',
-                                                      history_messages_key='history', output_messages_key='answer')
-    message = with_message_history.invoke({"input": input_str}, config={'configurable': {'session_id': 'test'}})
+                                                      history_messages_key='chat_history', output_messages_key='answer')
+    message = with_message_history.invoke({"input": input_str, "context": system_prompt}, config={'configurable': {'session_id': 'test'}})
     return message['answer'].strip()
 
 
