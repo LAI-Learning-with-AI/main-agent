@@ -2,7 +2,6 @@
 # from langchain_community.chat_models import ChatOpenAI
 from langchain_openai import ChatOpenAI
 from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -23,11 +22,13 @@ def generate(input_str, system_prompt=None, chat_history_func=None, retriever=No
     elif retriever:
         return generate_with_docs(input_str, system_prompt, retriever)
     else:
-        return generate_base(input_str)
+        return generate_base(input_str, system_prompt)
 
 
-def generate_base(input_str):
-    prompt = PromptTemplate.from_template("{input_str}")
+def generate_base(input_str, system_prompt):
+    prompt = ChatPromptTemplate.from_messages([("system", system_prompt),
+                                               MessagesPlaceholder(variable_name="history"),
+                                               ("human", "{input}")])
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7, max_tokens=1024)
     chain = LLMChain(prompt=prompt, llm=llm)
     message = chain.invoke(input_str)
