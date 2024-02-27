@@ -1,9 +1,16 @@
-from utils.text_generation import generate, get_rating
+from utils.text_generation import generate, get_rating, generate_with_docs
+from langchain_community.chat_message_histories import ChatMessageHistory
 from datetime import datetime
 from memory import *
 from utils.embeddings import *
 
 debug = True
+
+chat_history = ChatMessageHistory()
+
+
+def get_chat_history(session_id: str = None):
+    return chat_history
 
 
 class Agent:
@@ -12,12 +19,15 @@ class Agent:
         self.description = description
         self.memories = []
         self.history = []
+        # self.chat_history = ChatMessageHistory()
         self.last_reflected_memory_index = 0
         self.memory_reflection_threshold = memory_reflection_threshold
         
     def __repr__(self):
         return f"Agent({self.name}, {self.description})"
-    
+
+    # TODO: Functionality for per session chat history
+
     def respond(self, prompt_meta, user_name, user_description, user_input):
         recent_history_limit = 4
         now = datetime.now()
@@ -39,6 +49,39 @@ class Agent:
 
         self.history.append(f"{user_name}: {user_input}")
         self.history.append(f"{self.name}: {response}")
+        return response
+
+    def respond_with_docs(self, prompt_meta, user_name, user_description, user_input, retriever):
+        recent_history_limit = 4
+        now = datetime.now()
+
+        prompt = f"You are {self.name}. {self.description} It is currently {now}. You are interacting with {user_name}. "
+
+        relevant_memory_string = ""
+        for memory in get_relevant_memories(user_input, self.memories):
+            relevant_memory_string += str(memory)
+
+        prompt += f"Consider the following relevant memories: {relevant_memory_string}.\n"
+
+        # prompt += f" You know the following about {user_name}: {user_description}"
+
+        prompt += f"{user_name}: {user_input}\nResponse: "
+        response = generate(prompt_meta.format(prompt), retriever=retriever)
+
+        if debug: print(f"============Agent Prompt============\n{prompt}\n\n")
+
+        self.history.append(f"{user_name}: {user_input}")
+        self.history.append(f"{self.name}: {response}")
+        return response
+
+    def respond_with_docs_and_history(self, system_prompt, user_name, user_description, user_input, retriever):
+        prompt = f"You are {self.name}. {self.description} You are interacting with {user_name}. "
+
+        response = generate(user_input, system_prompt.format(prompt), get_chat_history, retriever)
+
+        if debug: print(f"============Chat History============\n{get_chat_history()}\n\n")
+        if debug: print(f"============Agent Prompt============\n{prompt}\n\n")
+
         return response
     
     def add_memory(self, user_name, action_result):

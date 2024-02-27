@@ -1,7 +1,9 @@
 from agent import Agent
-from datetime import datetime
-from utils.loaders import load_document
+# from datetime import datetime
+# from utils.loaders import load_document
 from better_profanity import profanity
+from utils.vectorstore import load_vectorstore
+import os
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -17,14 +19,13 @@ def main():
                    "focus is in AI and Machine Learning. He will say \"I don't know.\" when he is unsure. He will not "
                    "directly answer student questions but instead prompt them towards the correct answer. He refuses to"
                    "answer questions not about Artificial Intelligence, Machine Learning, Computer Science, "
-                   "or something in the field. When a subject he doesn't know about comes"
-                   "up, he will say \"I can't help with that.\".")
+                   "Programming, or something in the field. When a subject he doesn't know about comes "
+                   "up, he will say \"I can't help with that.\". He will do his best to assist the student.")
 
-    # Load documents
-    docs = []
-    docs += load_document("./ml_materials/videos/3blue1brown_1_what_is_a_nn.txt")
-
-    # TODO: Setup local vector store
+    # Load Vector Store
+    vectorstore = load_vectorstore(database="corpus", password=os.getenv("POSTGRESQL_PASSWORD"), collection_name="corpus")
+    search_result = vectorstore.search("AI", "similarity")
+    retriever = vectorstore.as_retriever()
 
     agent = Agent(name, description)
 
@@ -32,9 +33,11 @@ def main():
     user_name = "Student"
     user_description = ""  # Potentially abstract "User" into own class and update description overtime
 
-    prompt_meta = ('### Instruction: \n{}\n### Respond in a couple of sentences. Try to keep the conversation going. '
-                   'Refuse to answer inappropriate questions.\n'
-                   'Response:')
+    system_prompt = ('### Instruction: \n{}\n### Respond in a couple of sentences. Try to keep the conversation going. '
+                     'Refuse to answer inappropriate questions.\n')
+    # prompt_meta = ('### Instruction: \n{}\n### Respond in a couple of sentences. Try to keep the conversation going. '
+    #                'Refuse to answer inappropriate questions.\n'
+    #                'Response:')
 
     profanity.load_censor_words()
 
@@ -46,8 +49,14 @@ def main():
             user_input = input("Enter your question: ")
             censored_input = profanity.censor(user_input)
             if debug: print(f"============User input============\n{censored_input}\n\n")
-            response = agent.respond(prompt_meta, user_name, user_description, censored_input)
-            print(f"============Agent response============\n{response}\n\n")
+            # if debug: print(f"============Relevant Docs============\n{retriever.get_relevant_documents(censored_input)}\n\n")
+
+            # response_docs = agent.respond_with_docs(prompt_meta, user_name, user_description, censored_input, retriever)
+            # response_base = agent.respond(prompt_meta, user_name, user_description, censored_input)
+            response_docs_and_history = agent.respond_with_docs_and_history(system_prompt, user_name, user_description, censored_input, retriever)
+            # print(f"============Agent Response============\n{response_base}\n\n")
+            # print(f"============Agent Response w/Docs============\n{response_docs}\n\n")
+            print(f"============Agent Response w/Docs&History============\n{response_docs_and_history}\n\n")
 
             # Update memories
             #agent.add_memory(user_name, censored_input)
