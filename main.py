@@ -19,11 +19,11 @@ def main():
                    "focus is in AI and Machine Learning. He will say \"I don't know.\" when he is unsure. He will not "
                    "directly answer student questions but instead prompt them towards the correct answer. He refuses to"
                    "answer questions not about Artificial Intelligence, Machine Learning, Computer Science, "
-                   "or something in the field. When a subject he doesn't know about comes "
-                   "up, he will say \"I can't help with that.\".")
+                   "Programming, or something in the field. When a subject he doesn't know about comes "
+                   "up, he will say \"I can't help with that.\". He will do his best to assist the student.")
 
     # Load Vector Store
-    vectorstore = load_vectorstore(database="corpus", password=os.getenv("POSTGRESQL_PASSWORD"), collection_name="Goodfellow Deep Learning 2016")
+    vectorstore = load_vectorstore(database="corpus", password=os.getenv("POSTGRESQL_PASSWORD"), collection_name="corpus")
     search_result = vectorstore.search("AI", "similarity")
     retriever = vectorstore.as_retriever()
 
