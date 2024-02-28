@@ -38,7 +38,7 @@ class Agent:
         for memory in get_relevant_memories(user_input, self.memories):
             relevant_memory_string += str(memory)
 
-        prompt += f"Consider the following relevant memories: {relevant_memory_string}.\n"
+        # prompt += f"Consider the following relevant memories: {relevant_memory_string}.\n"
 
         # prompt += f" You know the following about {user_name}: {user_description}"
 
@@ -57,11 +57,11 @@ class Agent:
 
         prompt = f"You are {self.name}. {self.description} It is currently {now}. You are interacting with {user_name}. "
 
-        relevant_memory_string = ""
-        for memory in get_relevant_memories(user_input, self.memories):
-            relevant_memory_string += str(memory)
+        # relevant_memory_string = ""
+        # for memory in get_relevant_memories(user_input, self.memories):
+        #    relevant_memory_string += str(memory)
 
-        prompt += f"Consider the following relevant memories: {relevant_memory_string}.\n"
+        # prompt += f"Consider the following relevant memories: {relevant_memory_string}.\n"
 
         # prompt += f" You know the following about {user_name}: {user_description}"
 
