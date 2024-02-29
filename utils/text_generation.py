@@ -63,17 +63,18 @@ def generate_with_docs_and_history(input_str, system_prompt, retriever, chat_his
     retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
     with_message_history = RunnableWithMessageHistory(retrieval_chain, chat_history_func, input_messages_key='input',
                                                       history_messages_key='chat_history', output_messages_key='answer')
-    message = with_message_history.invoke({"input": input_str, "context": system_prompt}, config={'configurable': {'session_id': 'test'}})
+    message = with_message_history.invoke({"input": input_str, "context": system_prompt},
+                                          config={'configurable': {'session_id': 'test'}})
     return message['answer'].strip()
 
 
 def get_rating(x):
     """
     Extracts a rating from a string.
-    
+
     Args:
     - x (str): The string to extract the rating from.
-    
+
     Returns:
     - int: The rating extracted from the string, or None if no rating is found.
     """

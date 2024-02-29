@@ -1,8 +1,8 @@
-from utils.text_generation import generate, get_rating, generate_with_docs
+from .utils.text_generation import generate, get_rating, generate_with_docs
 from langchain_community.chat_message_histories import ChatMessageHistory
 from datetime import datetime
-from memory import *
-from utils.embeddings import *
+from .memory import *
+from .utils.embeddings import *
 
 debug = True
 
@@ -22,7 +22,7 @@ class Agent:
         # self.chat_history = ChatMessageHistory()
         self.last_reflected_memory_index = 0
         self.memory_reflection_threshold = memory_reflection_threshold
-        
+
     def __repr__(self):
         return f"Agent({self.name}, {self.description})"
 
@@ -83,7 +83,7 @@ class Agent:
         if debug: print(f"============Agent Prompt============\n{prompt}\n\n")
 
         return response
-    
+
     def add_memory(self, user_name, action_result):
         embed = get_embedding(action_result)
         print(f"============Embedding is {len(embed)}============\n\n")

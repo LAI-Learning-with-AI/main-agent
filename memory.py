@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, tzinfo
 import numpy as np
 from uuid import UUID, uuid4
-import utils.embeddings
+from .utils import embeddings
 import math
 import pytz
 
