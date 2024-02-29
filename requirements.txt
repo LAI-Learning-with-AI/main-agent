@@ -7,3 +7,4 @@ tiktoken~=0.6.0
 python-dotenv~=1.0.1
 langchain-openai~=0.0.8
 pytz~=2024.1
+langchainhub~=0.1.14
