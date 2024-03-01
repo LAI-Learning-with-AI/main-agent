@@ -4,13 +4,10 @@ from better_profanity import profanity
 from datetime import datetime
 import os
 # Fix errors when importing locally versus as submodule
-print(__package__)
 if __package__ is None or __package__ == '':
-    print("============Importing locally============")
     from agent import Agent
     from utils.vectorstore import load_vectorstore
 else:
-    print("============Importing as submodule============")
     from .agent import Agent
     from .utils.vectorstore import load_vectorstore
 
