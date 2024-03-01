@@ -1,5 +1,9 @@
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
-from agent import Agent
+# Fix errors when importing locally versus as submodule
+if __package__ is None or __package__ == '':
+    from agent import Agent
+else:
+    from .agent import Agent
 from better_profanity import profanity
 from utils.vectorstore import load_vectorstore
 import os

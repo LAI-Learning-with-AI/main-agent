@@ -1,8 +1,14 @@
-from .utils.text_generation import generate, get_rating, generate_with_docs
 from langchain_community.chat_message_histories import ChatMessageHistory
 from datetime import datetime
-from .memory import *
-from .utils.embeddings import *
+
+if __package__ is None or __package__ == '':
+    from utils.text_generation import generate, get_rating, generate_with_docs
+    from memory import *
+    from utils.embeddings import *
+else:
+    from .utils.text_generation import generate, get_rating, generate_with_docs
+    from .memory import *
+    from .utils.embeddings import *
 
 debug = True
 

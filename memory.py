@@ -1,9 +1,13 @@
 from datetime import datetime, timedelta, tzinfo
 import numpy as np
 from uuid import UUID, uuid4
-from .utils import embeddings
 import math
 import pytz
+
+if __package__ is None or __package__ == '':
+    from utils import embeddings
+else:
+    from .utils import embeddings
 
 IMPORTANCE_WEIGHT = 1
 SIMILARITY_WEIGHT = 1
