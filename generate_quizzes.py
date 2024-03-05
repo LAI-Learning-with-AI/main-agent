@@ -1,18 +1,19 @@
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
-# Fix errors when importing locally versus as submodule
+from better_profanity import profanity
+from utils.vectorstore import load_vectorstore
+import os
+
+# fix errors when importing locally versus as submodule
 if __package__ is None or __package__ == '':
     from agent import Agent
 else:
     from .agent import Agent
-from better_profanity import profanity
-from utils.vectorstore import load_vectorstore
-import os
 
 # basic model info
 name = "Quiz Generation AI"
 description = ("Quiz Generation AI helps students learn by generating quizzes for students to evaluate their understanding.")
 prompt_meta = ("### Instruction: \n{}\n### You will be given the number of quiz questions, topics the quiz must cover, and types of the quiz "
-               "questions (i.e. multiple choice, multiple choice and free response, etc.) to generate a quiz from.")
+               "questions (i.e. multiple choice, multiple choice and free response, etc.) to generate a quiz with.")
 
 agent = Agent(name, description)
 
@@ -25,10 +26,10 @@ censored_type_questions = profanity.censor(type_questions)
 topics = input("Enter the topics you want the questions to be about: ")
 censored_topics = profanity.censor(topics)
 
-censored_prompt = ("Now generate a quiz with " + censored_num_questions + " questions about " + censored_topics + " with the following types of questions: " + censored_type_questions + ". "
-                   "Generate an answer key below the quiz too. Do not provide a quiz title or descriptive text, start immediately with the questions. Refuse to generate the quiz "
-                   "if the number of questions is over 50, the topics are not relevant to a machine learning course, or the provided question types are not: multiple choice, "
-                   "free response, coding, or true/false.")
+censored_prompt = ("Make a quiz with " + censored_num_questions + " questions about " + censored_topics + " with the following question types: " + censored_type_questions + ". "
+                   "Generate an answer key below the quiz. Start immediately with question 1 and no other unnecessary text. Include the topic next to each question. "
+                   "Do not generate a quiz if it is over 50 questions, the topics are not relevant to a machine learning course, or the provided question types are not: "
+                   "multiple choice, free response, coding, or true/false.")
 
 # load embeddings similar to the user-supplied topics
 vectorstore = load_vectorstore(database="postgres", password=os.getenv("POSTGRESQL_PASSWORD"), collection_name="corpus")
