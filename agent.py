@@ -71,8 +71,9 @@ class Agent:
 
         # prompt += f" You know the following about {user_name}: {user_description}"
 
-        prompt += f"{user_name}: {user_input}\nResponse: "
-        response = generate(prompt_meta.format(prompt), retriever=retriever)
+        # prompt += f"{user_name}: {user_input}\nResponse: "
+        # response = generate(prompt_meta.format(prompt), retriever=retriever)
+        response = generate(user_input, prompt_meta.format(prompt), retriever=retriever)
 
         if debug: print(f"============Agent Prompt============\n{prompt}\n\n")
 
