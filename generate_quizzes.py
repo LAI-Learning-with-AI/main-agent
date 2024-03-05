@@ -28,8 +28,7 @@ censored_topics = profanity.censor(topics)
 
 censored_prompt = ("Make a quiz with " + censored_num_questions + " questions about " + censored_topics + " with the following question types: " + censored_type_questions + ". "
                    "Generate an answer key below the quiz. Start immediately with question 1 and no other unnecessary text. Include the topic next to each question. "
-                   "Do not generate a quiz if it is over 50 questions, the topics are not relevant to a machine learning course, or the provided question types are not: "
-                   "multiple choice, free response, coding, or true/false.")
+                   "Do not generate a quiz if the topics are not relevant to a machine learning course.")
 
 # load embeddings similar to the user-supplied topics
 vectorstore = load_vectorstore(database="postgres", password=os.getenv("POSTGRESQL_PASSWORD"), collection_name="corpus")
