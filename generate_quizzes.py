@@ -36,6 +36,6 @@ search_result = vectorstore.search(censored_topics, "similarity")
 retriever = vectorstore.as_retriever()
 
 # generate quiz
-response_docs_and_history = agent.respond_with_docs_and_history(description, "miscellaneous student", "", censored_prompt, retriever)
+response_docs = agent.respond_with_docs(description, "miscellaneous student", "", censored_prompt, retriever)
 
-print(f"============Agent Response============\n{response_docs_and_history}\n\n")
+print(f"============Agent Response============\n{response_docs}\n\n")
