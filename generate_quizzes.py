@@ -30,33 +30,42 @@ def _parse_mc_quiz(quiz):
 
     # traverse each question
     quiz = quiz.split("\n\n")
-    for question in quiz:
+    for section in quiz:
+
+        question = ''
+        topics = ''
+        type = ''
+        choices = ''
+        answer = ''
 
         # traverse each line
-        lines = question.split("\n")
+        lines = section.split("\n")
         for line in lines:
 
-            choices = ''
+            question_pattern = re.compile(r'\d+\.')
+            topic_pattern = re.compile(r'Topic: ')
+            type_pattern = re.compile(r'Type: ')
+            choices_pattern = re.compile(r'[A-D]\) ')
+            answer_pattern = re.compile(r'Answer: ')
 
-            question = re.compile(r'\d+\.') # regex to find literal question text
-            if question.search(line):
+            if question_pattern.search(line):
                 question = line.split(". ")[1]
-            elif 'Topic' in line:
+            elif topic_pattern.search(line):
                 topics = line.split(": ")[1]
-            elif 'Type:' in line:
+            elif type_pattern.search(line):
                 type = line.split(": ")[1]
-            elif 'A' in line or 'B' in line or 'C' in line or 'D' in line:
-                choices += line.split(") ")[1] + ", "
-            elif 'Answer' in line:
+            elif answer_pattern.search(line):
                 answer = line.split(") ")[1]
+            elif choices_pattern.search(line):
+                choices += line.split(") ")[1] + ", "
 
-            body["questions"].append({
-                "type": "MULTIPLE_CHOICE",
-                "question": question,
-                "topics": topics,
-                "choices": choices,
-                "answer": answer
-            })
+        body["questions"].append({
+            "type": type,
+            "question": question,
+            "topics": topics,
+            "choices": choices[:-2], # -2 to remove comma at end
+            "answer": answer
+        })
 
     return body
         
@@ -75,12 +84,14 @@ def generate_quiz(numQs, types, topics):
 
     agent = Agent(name, description)
 
-    prompt = ("Make a quiz with the following number of questions: " + numQs + ", the following question topics: " + topics + " and "
+    prompt = ("Make a quiz with exactly " + numQs + "questions, the following question topics: " + topics + " and "
                     "the following types of questions: " + types + "."
                     "\n\nStart immediately with question 1 and no other unnecessary text like a quiz title."
-                    "\n\nNext to each question, list the question topic and type of question once, i.e.: \"5. Here is a question.\nTopic: topic1\nType: multiple choice\""
+                    "\n\nNext to each question, list the question topic and type of question once, i.e.: \"5. Here is a question.\nTopic: topic1\nType: MULTIPLE_CHOICE\". Types must "
+                    "be one of the following: MULTIPLE_CHOICE, TRUE_FALSE, SHORT_ANSWER, CODING."
                     "\n\nFor multiple choice questions, list the answer choices immediately after the \"Type\" line with no whitespace, i.e.: \"A) choice1\nB) choice2\nC) choice3\nD) choice4\""
-                    "\n\nList the correct answer immediately next, with no whitespace or blank line."
+                    "\n\nList the correct answer immediately on the next line, i.e. for multiple choice: \"D) choice4\nAnswer: choice4\", and for all other question types, \"Type: free "
+                    "response\nAnswer: answer\". There should not be a blank line."
                     "\n\nDo not generate a quiz if the topics are not relevant to a machine learning course.")
     
     # RAG for embeddings similar to user-supplied topics
@@ -94,4 +105,4 @@ def generate_quiz(numQs, types, topics):
     # parse quiz and return formatted JSON
     body = _parse_mc_quiz(response)
 
-    return body
+    return body #response
