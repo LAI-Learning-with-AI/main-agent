@@ -5,13 +5,10 @@
 .idea/learning-agent-test.iml
 .idea/misc.xml
 .idea/modules.xml
-__pycache__/agent.cpython-311.pyc
-__pycache__/memory.cpython-311.pyc
 temp.py
-utils/__pycache__/__init__.cpython-311.pyc
-utils/__pycache__/embeddings.cpython-311.pyc
-utils/__pycache__/text_generation.cpython-311.pyc
 utils/__init__.py
 /.idea/main-agent.iml
 /.idea/vcs.xml
 /ml_materials/
+__pycache__
+utils/__pycache__
