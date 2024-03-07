@@ -12,13 +12,6 @@ else:
 
 debug = True
 
-chat_history = ChatMessageHistory()
-
-
-def get_chat_history(session_id: str = None):
-    return chat_history
-
-
 class Agent:
     def __init__(self, name, description, memory_reflection_threshold=20):
         self.name = name
@@ -62,17 +55,6 @@ class Agent:
         now = datetime.now()
 
         prompt = f"You are {self.name}. {self.description} It is currently {now}. You are interacting with {user_name}. "
-
-        # relevant_memory_string = ""
-        # for memory in get_relevant_memories(user_input, self.memories):
-        #    relevant_memory_string += str(memory)
-
-        # prompt += f"Consider the following relevant memories: {relevant_memory_string}.\n"
-
-        # prompt += f" You know the following about {user_name}: {user_description}"
-
-        # prompt += f"{user_name}: {user_input}\nResponse: "
-        # response = generate(prompt_meta.format(prompt), retriever=retriever)
         response = generate(user_input, prompt_meta.format(prompt), retriever=retriever)
 
         if debug: print(f"============Agent Prompt============\n{prompt}\n\n")
@@ -81,8 +63,19 @@ class Agent:
         self.history.append(f"{self.name}: {response}")
         return response
 
-    def respond_with_docs_and_history(self, system_prompt, user_name, user_description, user_input, retriever):
+    def respond_with_docs_and_history(self, system_prompt, user_name, user_description, user_input, retriever, messages):
         prompt = f"You are {self.name}. {self.description} You are interacting with {user_name}. "
+
+        # Build chat history
+        chat_history = ChatMessageHistory(messages=[]) # remove messages=[] if causing issues
+        for i in range(len(messages)):
+            if i % 2 == 0:
+                chat_history.add_user_message(messages[i])
+            else:
+                chat_history.add_ai_message(messages[i])
+
+        def get_chat_history(session_id: str = None):
+            return chat_history
 
         response = generate(user_input, system_prompt.format(prompt), get_chat_history, retriever)
 
