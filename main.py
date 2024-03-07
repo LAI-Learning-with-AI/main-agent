@@ -32,7 +32,7 @@ def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_message
                    "up, he will say \"I can't help with that.\". He will do his best to assist the student.")
 
     # Load Vector Store
-    vectorstore = load_vectorstore(database="corpus", password=os.getenv("POSTGRESQL_PASSWORD"),
+    vectorstore = load_vectorstore(database="postgres", password=os.getenv("POSTGRESQL_PASSWORD"),
                                    collection_name="corpus")
     # search_result = vectorstore.search("AI", "similarity")
     retriever = vectorstore.as_retriever()

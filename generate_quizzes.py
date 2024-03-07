@@ -17,6 +17,7 @@ def _parse_mc_quiz(quiz):
 
     # expecting the following raw quiz format:
 
+    ####################
     # 2. In supervised learning, what is the main characteristic of the training data?
     # Topic: Supervised learning
     # Type: Multiple choice
@@ -25,6 +26,18 @@ def _parse_mc_quiz(quiz):
     # C) It contains missing values
     # D) It is not used for training
     # Answer: A) It is labeled
+
+    # 3. Here is another question??
+    # Topic: Supervised learning
+    # Type: Multiple choice
+    # A) It is cat.
+    # B) It is dog.
+    # C) It is car.
+    # D) It is bike.
+    # Answer: A) It is cat.
+
+    # 4. ...
+    ####################
 
     body = {"questions": []}
 

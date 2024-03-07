@@ -11,7 +11,7 @@ def load_vectorstore_helper(connection_string, collection_name="embeddings", emb
 
 
 def load_vectorstore(host="localhost", port=5432, driver="psycopg2", user="postgres", password="postgres",
-                     database="corpus", collection_name="embeddings"):
+                     database="postgres", collection_name="embeddings"):
     connection_string = PGVector.connection_string_from_db_params(
         driver=driver,
         host=host,
