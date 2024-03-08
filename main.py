@@ -17,7 +17,7 @@ load_dotenv()
 
 # debug = True
 
-def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_messages=None, user_data=None, debug=False):
+def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_messages=[], user_data=None, debug=False):
     print(f"Request Data: \nuserid: {userid}, \nchatid: {chatid}, \nmessage: {message}, "
           f"\nprevious_messages: {previous_messages}, \nuser_data: {user_data}\n\n")
 
@@ -32,7 +32,8 @@ def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_message
     #                "up, he will say \"I can't help with that.\". He will do his best to assist the student.")
     description = ("Tutor is a helpful AI assistant. He does his best to help students answer questions. He will say "
                    "\"I don't know.\" when he is unsure. He will not directly answer student questions but instead "
-                   "prompt them towards the correct answer.")
+                   "prompt them towards the correct answer. \nIf information about the subject does not exist in the "
+                   "CONTEXT, say \"I can't find a resource to help with that.\"")
 
     # Load Vector Store
     vectorstore = load_vectorstore(database="postgres", password=os.getenv("POSTGRESQL_PASSWORD"),
@@ -89,5 +90,5 @@ def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_message
 
 
 if __name__ == '__main__':
-    pMessages = ["What is Deep Learning?", "That is a complex Machine Learning Topic."]
-    run_chat(previous_messages=pMessages, debug=True)
+    # pMessages = ["What is Deep Learning?", "That is a complex Machine Learning Topic."]
+    run_chat(debug=True)
