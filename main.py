@@ -14,7 +14,6 @@ else:
 from dotenv import load_dotenv
 load_dotenv()
 
-
 # debug = True
 
 def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_messages=None, user_data=None, debug=False):
@@ -81,7 +80,7 @@ def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_message
     else:
         censored_input = profanity.censor(message)
         response_docs_and_history = agent.respond_with_docs_and_history(system_prompt, user_name, user_description,
-                                                                        censored_input, retriever)
+                                                                        censored_input, retriever, previous_messages)
         return response_docs_and_history, datetime.now()
 
 
