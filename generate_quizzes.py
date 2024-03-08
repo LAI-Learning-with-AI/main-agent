@@ -84,7 +84,7 @@ def _parse_mc_quiz(quiz):
         
 
 
-def generate_quiz(numQs, types, topics):
+def generate_mc_quiz(numQs, types, topics):
 
     numQs = str(numQs) 
     topics = profanity.censor(topics) # profanity check the topics
