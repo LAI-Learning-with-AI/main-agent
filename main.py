@@ -14,6 +14,7 @@ else:
 from dotenv import load_dotenv
 load_dotenv()
 
+
 # debug = True
 
 def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_messages=None, user_data=None, debug=False):
@@ -23,12 +24,15 @@ def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_message
     name = "Tutor"
     # TODO: Figure out answer in backend first, then begin the helping process
     # TODO: Consider putting description in plain-text config file so it is easier to change
-    description = ("Tutor is a helpful AI assistant. He does his best to help students answer questions. His subject "
-                   "focus is in AI and Machine Learning. He will say \"I don't know.\" when he is unsure. He will not "
-                   "directly answer student questions but instead prompt them towards the correct answer. He refuses to"
-                   "answer questions not about Artificial Intelligence, Machine Learning, Computer Science, "
-                   "Programming, or something in the field. When a subject he doesn't know about comes "
-                   "up, he will say \"I can't help with that.\". He will do his best to assist the student.")
+    # description = ("Tutor is a helpful AI assistant. He does his best to help students answer questions. His subject "
+    #                "focus is in AI and Machine Learning. He will say \"I don't know.\" when he is unsure. He will not "
+    #                "directly answer student questions but instead prompt them towards the correct answer. He refuses to"
+    #                "answer questions not about Artificial Intelligence, Machine Learning, Computer Science, "
+    #                "Programming, or something in the field. When a subject he doesn't know about comes "
+    #                "up, he will say \"I can't help with that.\". He will do his best to assist the student.")
+    description = ("Tutor is a helpful AI assistant. He does his best to help students answer questions. He will say "
+                   "\"I don't know.\" when he is unsure. He will not directly answer student questions but instead "
+                   "prompt them towards the correct answer.")
 
     # Load Vector Store
     vectorstore = load_vectorstore(database="postgres", password=os.getenv("POSTGRESQL_PASSWORD"),
@@ -80,7 +84,7 @@ def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_message
     else:
         censored_input = profanity.censor(message)
         response_docs_and_history = agent.respond_with_docs_and_history(system_prompt, user_name, user_description,
-                                                                        censored_input, retriever, previous_messages)
+                                                                        censored_input, retriever)
         return response_docs_and_history, datetime.now()
 
 
