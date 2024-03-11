@@ -128,11 +128,12 @@ def _parse_quiz(quiz, numQs, topics, types):
         
 
 
-# TODO: test all this code
 def generate_quiz(numQs, types, topics, debugMode):
     '''Given a numer of question, question types, question topics, and a bool debugMode, generates and
-    returns a quiz using GPT. Takes 3 total attempts if the quiz is not formatted properly. If debugMode
-    is true, returns nothing but prints out the raw generated quiz for debugging purposes.'''
+    returns a quiz using GPT. Takes 3 total attempts if the quiz is not formatted properly.
+    
+    If debugMode is true, returns nothing and does not attempt parsing, rather prints the raw generated
+    quiz on the first attempt for debugging purposes.'''
 
     numQs = str(numQs) 
     topics = profanity.censor(topics) # profanity check the topics
