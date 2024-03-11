@@ -14,30 +14,32 @@ else:
 
 
 def _parse_mc_quiz(quiz):
+    '''Taking a multiple choice GPT quiz input of a specified format, parse the quiz and return
+    it as formatted JSON for HTTP API calls. False will be returned if the quiz is not formatted properly.
 
-    # expecting the following raw quiz format:
+    Expected format:
+    
+    2. In supervised learning, what is the main characteristic of the training data?
+    Topic: Supervised learning
+    Type: Multiple choice
+    A) It is labeled
+    B) It is unlabeled
+    C) It contains missing values
+    D) It is not used for training
+    Answer: A) It is labeled
 
-    ####################
-    # 2. In supervised learning, what is the main characteristic of the training data?
-    # Topic: Supervised learning
-    # Type: Multiple choice
-    # A) It is labeled
-    # B) It is unlabeled
-    # C) It contains missing values
-    # D) It is not used for training
-    # Answer: A) It is labeled
-
-    # 3. Here is another question??
-    # Topic: Supervised learning
-    # Type: Multiple choice
-    # A) It is cat.
-    # B) It is dog.
-    # C) It is car.
-    # D) It is bike.
-    # Answer: A) It is cat.
+    3. Here is another question??
+    Topic: Supervised learning
+    Type: Multiple choice
+    A) It is cat.
+    B) It is dog.
+    C) It is car.
+    D) It is bike.
+    Answer: A) It is cat.
 
     # 4. ...
-    ####################
+
+    '''
 
     body = {"questions": []}
 
@@ -45,11 +47,11 @@ def _parse_mc_quiz(quiz):
     quiz = quiz.split("\n\n")
     for section in quiz:
 
-        question = ''
-        topics = ''
-        type = ''
-        choices = ''
-        answer = ''
+        question = ""
+        topics = ""
+        type = ""
+        choices = ""
+        answer = ""
 
         # traverse each line
         lines = section.split("\n")
@@ -72,6 +74,13 @@ def _parse_mc_quiz(quiz):
             elif choices_pattern.search(line):
                 choices += line.split(") ")[1] + ", "
 
+        # mc question does not have 4 answer choices, return False
+        if len(choices[:-2].split(",")) != 4: # -2 to remove comma at end
+            return False
+        # mc question is not the correct type, return False
+        if type != "MULTIPLE_CHOICE":
+            return False
+
         body["questions"].append({
             "type": type,
             "question": question,
@@ -84,7 +93,9 @@ def _parse_mc_quiz(quiz):
         
 
 
-def generate_mc_quiz(numQs, types, topics):
+def generate_quiz(numQs, types, topics):
+    '''Given a numer of question, question types, and question topics, generates and returns a quiz
+    using GPT. Takes 3 total attempts if the quiz is not formatted properly.'''
 
     numQs = str(numQs) 
     topics = profanity.censor(topics) # profanity check the topics
@@ -98,10 +109,10 @@ def generate_mc_quiz(numQs, types, topics):
     agent = Agent(name, description)
 
     prompt = ("Make a quiz with exactly " + numQs + "questions, the following question topics: " + topics + " and "
-                    "the following types of questions: " + types + "."
+                    "the following types of questions: " + types + ". Additional instructions:"
                     "\n\nStart immediately with question 1 and no other unnecessary text like a quiz title."
-                    "\n\nNext to each question, list the question topic and type of question once, i.e.: \"5. Here is a question.\nTopic: topic1\nType: MULTIPLE_CHOICE\". Types must "
-                    "be one of the following: MULTIPLE_CHOICE, TRUE_FALSE, SHORT_ANSWER, CODING."
+                    "\n\nNext to each question, list the question topic and type of question once, i.e.: \"5. Here is a question.\nTopic: topic1\nType: MULTIPLE_CHOICE\"."
+                    "\n\nQuestion types must be one of the following: MULTIPLE_CHOICE, TRUE_FALSE, SHORT_ANSWER, CODING."
                     "\n\nFor multiple choice questions, list the answer choices immediately after the \"Type\" line with no whitespace, i.e.: \"A) choice1\nB) choice2\nC) choice3\nD) choice4\""
                     "\n\nList the correct answer immediately on the next line, i.e. for multiple choice: \"D) choice4\nAnswer: choice4\", and for all other question types, \"Type: free "
                     "response\nAnswer: answer\". There should not be a blank line."
@@ -117,5 +128,11 @@ def generate_mc_quiz(numQs, types, topics):
 
     # parse quiz and return formatted JSON
     body = _parse_mc_quiz(response)
+
+    # 2 retries if quiz is not formatted properly
+    for i in range(2):
+        if body == False or len(body['questions']) != numQs:
+            response = agent.respond_with_docs(description, "miscellaneous student", "", prompt, retriever)
+            body = _parse_mc_quiz(response)
 
     return body #response
