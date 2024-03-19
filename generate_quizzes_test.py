@@ -4,4 +4,5 @@ if __package__ is None or __package__ == '':
 else:
     from .generate_quizzes import generate_quiz
 
-generate_quiz(10, 'short answer', 'dimensionality reduction, supervised learning', True)
+json = generate_quiz(10, 'SHORT_ANSWER, CODING', 'dimensionality reduction, supervised learning', False)
+print(json)
