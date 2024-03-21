@@ -10,8 +10,7 @@ else:
 
 
 # takes in string array
-def get_similar(topics: list[str], max_per_topic: int = 5) -> dict:
-    body = {"resources": []}
+def get_similar(topics: list[str], max_per_topic: int = 5) -> list:
     result = []
     vs = load_vectorstore(database="postgres", password=os.getenv("POSTGRESQL_PASSWORD"),
                           collection_name="corpus")
@@ -21,6 +20,6 @@ def get_similar(topics: list[str], max_per_topic: int = 5) -> dict:
 
     # for each item in result, add metadata["source"] to body["resources"] using list comprehension
     # only adding unique sources
-    body["resources"] = list({item.metadata["source"]: None for item in result}.keys())
+    result = list({item.metadata["source"]: None for item in result}.keys())
 
-    return body
+    return result
