@@ -133,7 +133,7 @@ def _parse_quiz(quiz, numQs, topics, types):
         
 
 
-def generate_quiz(numQs, types, topics, debugMode):
+def generate_quiz(numQs, types, topics, debugMode=False):
     '''Given a numer of question, question types, question topics, and a bool debugMode, generates and
     returns a quiz using GPT. Takes 3 total attempts if the quiz is not formatted properly.
     
