@@ -27,6 +27,7 @@ class Agent:
 
     # TODO: Functionality for per session chat history
 
+    # DEPRECATED
     def respond(self, prompt_meta, user_name, user_description, user_input):
         recent_history_limit = 4
         now = datetime.now()
