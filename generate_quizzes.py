@@ -45,8 +45,8 @@ def _parse_quiz(quiz, numQs, topics, types):
     body = {"questions": []}
 
     # traverse each question
-    split_quiz = quiz.split("\n\n")
-    for question in split_quiz:
+    split_quiz = quiz.split("------DIVIDER------\n")
+    for section in split_quiz:
 
         question = ""
         topic = ""
@@ -54,8 +54,11 @@ def _parse_quiz(quiz, numQs, topics, types):
         choices = ""
         answer = ""
 
+        # skip blank question sections (i.e. if divider is at end of quiz)
+        if section == "" or section == "\n": continue
+
         # traverse each line
-        lines = question.split("\n")
+        lines = section.split("\n")
         within_answer = False # flag for handling multi-line answers (for coding questions)
         for line in lines:
 
@@ -150,13 +153,13 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
 
     prompt = ("Make a quiz with exactly " + str(numQs) + "questions on the following question topics: " + topics + ", and only "
                     "the following types of questions: " + types + ". Additional instructions:"
-                    "\n\nStart immediately with question 1 and no other unnecessary text like a quiz title, i.e. \"1. Here is a question.\""
+                    "\n\nStart immediately with the first question and no other unnecessary text like a quiz title, i.e. \"1. Here is a question.\""
                     "\n\nOn the line immediately after the question, list the question topic, i.e. \"Topic: topic1\"."
-                    "\n\nOn the line immediately after the topic, list the question type, i.e. \"Type: MULTIPLE_CHOICE\". The type should be one of the types specified in the prompt."
+                    "\n\nOn the line immediately after the topic, list the question type, i.e. \"Type: MULTIPLE_CHOICE\". The type should only be one of the aforementioned types requested."
                     "\n\nFor MULTIPLE_CHOICE and TRUE_FALSE questions, list the answer choices following the topic, i.e. \"A) True\nB) False\"."
-                    "\n\nOn the immediate next line and with no whitespace, list the answer to the question, i.e.: \"Answer: A) True\" or \"Answer: choice1\". For coding questions, list the full code implementation in Python within triple apostrophes."
-                    "\n\nThere should not be any whitespace between a question, its topic, its type, its answer choices, and its answer."
-                    "\n\nDo not generate a quiz if the topics are not relevant to a machine learning course.")
+                    "\n\nOn the immediate next line, list the answer to the question, i.e.: \"Answer: A) True\" or \"Answer: choice1\". For coding questions, list the full code implementation in Python within triple apostrophes."
+                    "\n\nEntire questions must be separated by a line with the text \"------DIVIDER------\" and nothing else."
+                    "\n\nDo not generate the quiz if the topics are highly irrelevant to a machine learning course, i.e. \"Ponies\"")
 
                     # "\n\nNext to each question, list the question topic and type of question once, i.e.: \"5. Here is a question.\nTopic: topic1\nType: MULTIPLE_CHOICE\"."
                     # "\n\nMULTIPLE_CHOICE questions will list the answer choices immediately after the \"Type\" line with no whitespace, i.e.: \"A) choice1\nB) choice2\nC) choice3\nD) choice4\""
@@ -173,7 +176,6 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
     # generate quiz
     print('\n========== GENERATION 1 ==========\n')
     response = agent.respond_with_docs(description, "miscellaneous student", "", prompt, retriever)
-    print(response) # TODO: Delete this whole line
 
     if seeRawQuiz:
         print(response)
