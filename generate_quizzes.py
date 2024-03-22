@@ -45,8 +45,8 @@ def _parse_quiz(quiz, numQs, topics, types):
     body = {"questions": []}
 
     # traverse each question
-    quiz = quiz.split("\n\n")
-    for section in quiz:
+    split_quiz = quiz.split("\n\n")
+    for question in split_quiz:
 
         question = ""
         topic = ""
@@ -55,7 +55,7 @@ def _parse_quiz(quiz, numQs, topics, types):
         answer = ""
 
         # traverse each line
-        lines = section.split("\n")
+        lines = question.split("\n")
         within_answer = False # flag for handling multi-line answers (for coding questions)
         for line in lines:
 
@@ -173,6 +173,7 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
     # generate quiz
     print('\n========== GENERATION 1 ==========\n')
     response = agent.respond_with_docs(description, "miscellaneous student", "", prompt, retriever)
+    print(response) # TODO: Delete this whole line
 
     if seeRawQuiz:
         print(response)
