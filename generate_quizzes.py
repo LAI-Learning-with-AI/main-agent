@@ -148,17 +148,23 @@ def generate_quiz(numQs, types, topics, debugMode=False):
 
     agent = Agent(name, description)
 
-    prompt = ("Make a quiz with exactly " + str(numQs) + "questions, the following question topics: " + topics + ", and "
+    prompt = ("Make a quiz with exactly " + str(numQs) + "questions on the following question topics: " + topics + ", and only "
                     "the following types of questions: " + types + ". Additional instructions:"
-                    "\n\nStart immediately with question 1 and no other unnecessary text like a quiz title."
-                    "\n\nNext to each question, list the question topic and type of question once, i.e.: \"5. Here is a question.\nTopic: topic1\nType: MULTIPLE_CHOICE\"."
-                    "\n\nQuestion types must be one of the following: MULTIPLE_CHOICE, TRUE_FALSE, SHORT_ANSWER, CODING."
-                    "\n\nMULTIPLE_CHOICE questions will list the answer choices immediately after the \"Type\" line with no whitespace, i.e.: \"A) choice1\nB) choice2\nC) choice3\nD) choice4\""
-                    "\n\nTRUE_FALSE questions will list the true/false answer choices immediately after the \"Type\" line with no whitespace, similar to MULTIPLE_CHOICE. I.e.: \"Type: TRUE_FALSE\nA) True\nB) False\"."
-                    "\n\nList the correct answer immediately after the answer choices (for MULTIPLE_CHOICE and TRUE_FALSE), or the question type (for SHORT_ANSWER and CODING), i.e. for MULTIPLE_CHOICE: \"D) choice4\nAnswer: "
-                    "choice4\", and for all other question types, \"Type: free response\nAnswer: answer\". There should not be a blank line."
-                    '\n\nFor coding questions, ensure the \"Answer: ...\" provides the full code implementation in Python and within triple apostrophes.'
+                    "\n\nStart immediately with question 1 and no other unnecessary text like a quiz title, i.e. \"1. Here is a question.\""
+                    "\n\nOn the line immediately after the question, list the question topic, i.e. \"Topic: topic1\"."
+                    "\n\nOn the line immediately after the topic, list the question type, i.e. \"Type: MULTIPLE_CHOICE\". The type should be one of the types specified in the prompt."
+                    "\n\nFor MULTIPLE_CHOICE and TRUE_FALSE questions, list the answer choices following the topic, i.e. \"A) True\nB) False\"."
+                    "\n\nOn the immediate next line and with no whitespace, list the answer to the question, i.e.: \"Answer: A) True\" or \"Answer: choice1\". For coding questions, list the full code implementation in Python within triple apostrophes."
+                    "\n\nThere should not be any whitespace between a question, its topic, its type, its answer choices, and its answer."
                     "\n\nDo not generate a quiz if the topics are not relevant to a machine learning course.")
+
+                    # "\n\nNext to each question, list the question topic and type of question once, i.e.: \"5. Here is a question.\nTopic: topic1\nType: MULTIPLE_CHOICE\"."
+                    # "\n\nMULTIPLE_CHOICE questions will list the answer choices immediately after the \"Type\" line with no whitespace, i.e.: \"A) choice1\nB) choice2\nC) choice3\nD) choice4\""
+                    # "\n\nTRUE_FALSE questions will list the true/false answer choices immediately after the \"Type\" line with no whitespace, similar to MULTIPLE_CHOICE. I.e.: \"Type: TRUE_FALSE\nA) True\nB) False\"."
+                    # "\n\nFor CODING questions, ensure the \"Answer: ...\" provides the full code implementation in Python and within triple apostrophes."
+                    # "\n\nSHORT_ANSWER questions should not pertain to any code or code implementations."
+                    # "\n\nFor all questions, list the answer on the last relevant line for the question, i.e.: \"...\nAnswer: \". There should not be a blank line before the answer."
+                    # "\n\nDo not generate a quiz if the topics are not relevant to a machine learning course.")
     
     # RAG for embeddings similar to user-supplied topics
     vectorstore = load_vectorstore(database="postgres", password=os.getenv("POSTGRESQL_PASSWORD"), collection_name="corpus")
