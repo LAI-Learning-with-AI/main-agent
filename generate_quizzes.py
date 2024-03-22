@@ -83,14 +83,15 @@ def _parse_quiz(quiz, numQs, topics, types):
         # check question-specific conditions of incorrect quiz format:
         # if question is MULTIPLE_CHOICE but does not have exactly 4 answer choices
         if (type == "MULTIPLE_CHOICE" and len(choices[:-2].split(",")) != 4):
+            print('ERROR: mc question does not have exactly 4 choices\nCHOICES: ' + choices)
             return False
         # if question is TRUE_FALSE but does not have exactly 2 answer choices
         if (type == "TRUE_FALSE" and len(choices[:-2].split(",")) != 2): # -2 to remove comma at end
-            print(choices)
+            print('ERROR: tf question does not have exactly 2 choices\nCHOICES: ' + choices)
             return False
         # if question is not a valid type
         if type != "MULTIPLE_CHOICE" and type != "SHORT_ANSWER" and type != "CODING" and type != "TRUE_FALSE":
-            print(type)
+            print('ERROR: question type is not valid\nTYPE: ' + type)
             return False
         # if question topic is not one of the specified topics
         topics_split = topics.split(",")
@@ -124,19 +125,18 @@ def _parse_quiz(quiz, numQs, topics, types):
 
     # if number of questions does not match number asked for in quiz generation
     if len(body["questions"]) != numQs:
-        print(len(body["questions"]))
+        print('ERROR: generated num of questions does not match expected num\nEXPECTED: ' + str(numQs) + '\nGENERATED: ' + str(len(body['questions'])))
         return False
     
     return body
         
 
 
-def generate_quiz(numQs, types, topics, debugMode=False):
+def generate_quiz(numQs, types, topics, seeRawQuiz=False):
     '''Given a numer of question, question types, question topics, and a bool debugMode, generates and
     returns a quiz using GPT. Takes 3 total attempts if the quiz is not formatted properly.
     
-    If debugMode is true, returns nothing and does not attempt parsing, rather prints the raw generated
-    quiz on the first attempt for debugging purposes.'''
+    If seeRawQuiz is true, prints the raw generated quiz on top of attempting and returning the parsed JSON.'''
 
     topics = profanity.censor(topics) # profanity check the topics
 
@@ -173,17 +173,16 @@ def generate_quiz(numQs, types, topics, debugMode=False):
     # generate quiz
     response = agent.respond_with_docs(description, "miscellaneous student", "", prompt, retriever)
 
-    if debugMode:
+    if seeRawQuiz:
         print(response)
-    else:
 
-        # parse quiz and return formatted JSON
-        body = _parse_quiz(response, numQs, topics, types)
+    # parse quiz and return formatted JSON
+    body = _parse_quiz(response, numQs, topics, types)
 
-        # 2 retries if quiz is not formatted properly
-        for i in range(2):
-            if body == False:
-                response = agent.respond_with_docs(description, "miscellaneous student", "", prompt, retriever)
-                body = _parse_quiz(response, numQs, topics, types)
+    # 2 retries if quiz is not formatted properly
+    for i in range(2):
+        if body == False:
+            response = agent.respond_with_docs(description, "miscellaneous student", "", prompt, retriever)
+            body = _parse_quiz(response, numQs, topics, types)
 
-        return body
+    return body
