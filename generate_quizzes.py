@@ -146,29 +146,29 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
 
     # model setup and prompting
     name = "Quiz Generation AI"
-    description = ("Quiz Generation AI helps students learn by generating quizzes for students to evaluate their understanding. "
-                   "### Instructions: You will be given the number of quiz questions, topics the quiz must cover, and types of the quiz "
-                   "questions (i.e. multiple choice, multiple choice and free response, etc.) to generate a quiz with.")
+    description = ("You will be given a number of quiz questions, quiz topics, and quiz question types from which to generate "
+                   "a quiz. Here are some rules regarding quiz generation:"
+                   "\n\nStart immediately with the first question and no other unnecessary text like a quiz title, i.e. \"1. How does regularization work?.\""
+                   "\n\nOn the line immediately after the question, list the question topic, i.e. \"Topic: topic1\"."
+                   "\n\nOn the line immediately after the topic, list the question type, i.e. \"Type: MULTIPLE_CHOICE\". The type should only be one of the aforementioned types requested."
+                   "\n\nFor MULTIPLE_CHOICE questions, list exactly 4 answer choices immediately following the topic, i.e. \"A) choice1\nB) choice2\nC) choice3\nD) choice4\"."
+                   "\n\nFor TRUE_FALSE questions, also list the 2 true/false options immediately following the topic, i.e. \"A) True\nB) False\"."
+                   "\n\nOn the immediate next line, list the answer to the question, i.e.: \"Answer: A) True\" or \"Answer: choice1\". For CODING question answers, list the full code implementation in Python within triple apostrophes."
+                   "\n\nEntire questions must be separated by a line with the text \"------DIVIDER------\" and nothing else."
+                   "\n\nDo not generate the quiz if the topics are highly irrelevant to a machine learning course, i.e. \"Ponies\".")
 
     agent = Agent(name, description)
 
-    prompt = ("Make a quiz with exactly " + str(numQs) + "questions, no more no less, on the following question topics: " + topics + ", and only "
-                    "using the following types of questions: " + types + ". Additional instructions:"
-                    "\n\nStart immediately with the first question and no other unnecessary text like a quiz title, i.e. \"1. How does regularization work?.\""
-                    "\n\nOn the line immediately after the question, list the question topic, i.e. \"Topic: topic1\"."
-                    "\n\nOn the line immediately after the topic, list the question type, i.e. \"Type: MULTIPLE_CHOICE\". The type should only be one of the aforementioned types requested."
-                    "\n\nFor MULTIPLE_CHOICE and TRUE_FALSE questions, list the answer choices immediately following the topic, i.e. \"A) True\nB) False\" for TRUE_FALSE. MULTIPLE_CHOICE questions should have exactly 4 answer choices."
-                    "\n\nOn the immediate next line, list the answer to the question, i.e.: \"Answer: A) True\" or \"Answer: choice1\". For CODING question answers, list the full code implementation in Python within triple apostrophes."
-                    "\n\nEntire questions must be separated by a line with the text \"------DIVIDER------\" and nothing else."
-                    "\n\nDo not generate the quiz if the topics are highly irrelevant to a machine learning course, i.e. \"Ponies\"")
+    prompt = ("Make a quiz with exactly " + str(numQs) + "questions on the following question topics: " + topics + ", and only "
+              "using the following types of questions: " + types + ".")
 
-                    # "\n\nNext to each question, list the question topic and type of question once, i.e.: \"5. Here is a question.\nTopic: topic1\nType: MULTIPLE_CHOICE\"."
-                    # "\n\nMULTIPLE_CHOICE questions will list the answer choices immediately after the \"Type\" line with no whitespace, i.e.: \"A) choice1\nB) choice2\nC) choice3\nD) choice4\""
-                    # "\n\nTRUE_FALSE questions will list the true/false answer choices immediately after the \"Type\" line with no whitespace, similar to MULTIPLE_CHOICE. I.e.: \"Type: TRUE_FALSE\nA) True\nB) False\"."
-                    # "\n\nFor CODING questions, ensure the \"Answer: ...\" provides the full code implementation in Python and within triple apostrophes."
-                    # "\n\nSHORT_ANSWER questions should not pertain to any code or code implementations."
-                    # "\n\nFor all questions, list the answer on the last relevant line for the question, i.e.: \"...\nAnswer: \". There should not be a blank line before the answer."
-                    # "\n\nDo not generate a quiz if the topics are not relevant to a machine learning course.")
+                # "\n\nNext to each question, list the question topic and type of question once, i.e.: \"5. Here is a question.\nTopic: topic1\nType: MULTIPLE_CHOICE\"."
+                # "\n\nMULTIPLE_CHOICE questions will list the answer choices immediately after the \"Type\" line with no whitespace, i.e.: \"A) choice1\nB) choice2\nC) choice3\nD) choice4\""
+                # "\n\nTRUE_FALSE questions will list the true/false answer choices immediately after the \"Type\" line with no whitespace, similar to MULTIPLE_CHOICE. I.e.: \"Type: TRUE_FALSE\nA) True\nB) False\"."
+                # "\n\nFor CODING questions, ensure the \"Answer: ...\" provides the full code implementation in Python and within triple apostrophes."
+                # "\n\nSHORT_ANSWER questions should not pertain to any code or code implementations."
+                # "\n\nFor all questions, list the answer on the last relevant line for the question, i.e.: \"...\nAnswer: \". There should not be a blank line before the answer."
+                # "\n\nDo not generate a quiz if the topics are not relevant to a machine learning course.")
     
     # RAG for embeddings similar to user-supplied topics
     vectorstore = load_vectorstore(database="postgres", password=os.getenv("POSTGRESQL_PASSWORD"), collection_name="corpus")
