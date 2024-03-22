@@ -152,9 +152,9 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
 
     agent = Agent(name, description)
 
-    prompt = ("Make a quiz with exactly " + str(numQs) + "questions on the following question topics: " + topics + ", and only "
+    prompt = ("Make a quiz with EXACTLY " + str(numQs) + "questions on the following question topics: " + topics + ", and only "
                     "the following types of questions: " + types + ". Additional instructions:"
-                    "\n\nStart immediately with the first question and no other unnecessary text like a quiz title, i.e. \"1. Here is a question.\""
+                    "\n\nStart immediately with the first question and no other unnecessary text like a quiz title, i.e. \"1. How does regularization work?.\""
                     "\n\nOn the line immediately after the question, list the question topic, i.e. \"Topic: topic1\"."
                     "\n\nOn the line immediately after the topic, list the question type, i.e. \"Type: MULTIPLE_CHOICE\". The type should only be one of the aforementioned types requested."
                     "\n\nFor MULTIPLE_CHOICE and TRUE_FALSE questions, list the answer choices following the topic, i.e. \"A) True\nB) False\"."
