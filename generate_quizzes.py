@@ -157,8 +157,8 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
                     "\n\nStart immediately with the first question and no other unnecessary text like a quiz title, i.e. \"1. How does regularization work?.\""
                     "\n\nOn the line immediately after the question, list the question topic, i.e. \"Topic: topic1\"."
                     "\n\nOn the line immediately after the topic, list the question type, i.e. \"Type: MULTIPLE_CHOICE\". The type should only be one of the aforementioned types requested."
-                    "\n\nFor MULTIPLE_CHOICE and TRUE_FALSE questions, list the answer choices following the topic, i.e. \"A) True\nB) False\"."
-                    "\n\nOn the immediate next line, list the answer to the question, i.e.: \"Answer: A) True\" or \"Answer: choice1\". For coding questions, list the full code implementation in Python within triple apostrophes."
+                    "\n\nFor MULTIPLE_CHOICE and TRUE_FALSE questions, list the answer choices following the topic, i.e. \"A) True\nB) False\". MULTIPLE_CHOICE questions should have exactly 4 answer choices."
+                    "\n\nOn the immediate next line, list the answer to the question, i.e.: \"Answer: A) True\" or \"Answer: choice1\". For CODING question answers, list the full code implementation in Python within triple apostrophes."
                     "\n\nEntire questions must be separated by a line with the text \"------DIVIDER------\" and nothing else."
                     "\n\nDo not generate the quiz if the topics are highly irrelevant to a machine learning course, i.e. \"Ponies\"")
 
