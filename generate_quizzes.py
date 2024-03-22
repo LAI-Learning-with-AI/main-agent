@@ -146,21 +146,21 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
 
     # model setup and prompting
     name = "Quiz Generation AI"
-    description = ("You will be given a number of quiz questions, quiz topics, and quiz question types from which to generate "
-                   "a quiz. Here are some rules regarding quiz generation:"
-                   "\n\nStart immediately with the first question and no other unnecessary text like a quiz title, i.e. \"1. How does regularization work?.\""
-                   "\n\nOn the line immediately after the question, list the question topic, i.e. \"Topic: topic1\"."
-                   "\n\nOn the line immediately after the topic, list the question type, i.e. \"Type: MULTIPLE_CHOICE\". The type should only be one of the aforementioned types requested."
-                   "\n\nFor MULTIPLE_CHOICE questions, list exactly 4 answer choices immediately following the topic, i.e. \"A) choice1\nB) choice2\nC) choice3\nD) choice4\"."
-                   "\n\nFor TRUE_FALSE questions, also list the 2 true/false options immediately following the topic, i.e. \"A) True\nB) False\"."
-                   "\n\nOn the immediate next line, list the answer to the question, i.e.: \"Answer: A) True\" or \"Answer: choice1\". For CODING question answers, list the full code implementation in Python within triple apostrophes."
-                   "\n\nEntire questions must be separated by a line with the text \"------DIVIDER------\" and nothing else."
-                   "\n\nDo not generate the quiz if the topics are highly irrelevant to a machine learning course, i.e. \"Ponies\".")
+    description = ("You are Quiz Generation AI. Quiz Generation AI is given a number of quiz questions, quiz topics, and quiz question "
+                   "types from which to generate a quiz.")
 
     agent = Agent(name, description)
 
     prompt = ("Make a quiz with exactly " + str(numQs) + "questions on the following question topics: " + topics + ", and only "
-              "using the following types of questions: " + types + ".")
+              "using the following types of questions: " + types + ". Additional instructions: "
+              "\n\nStart immediately with the first question and no other unnecessary text like a quiz title, i.e. \"1. How does regularization work?.\""
+              "\n\nOn the line immediately after the question, list the question topic, i.e. \"Topic: topic1\"."
+              "\n\nOn the line immediately after the topic, list the question type, i.e. \"Type: MULTIPLE_CHOICE\". The type should only be one of the aforementioned types requested."
+              "\n\nFor MULTIPLE_CHOICE questions, list exactly 4 answer choices immediately following the topic, i.e. \"A) choice1\nB) choice2\nC) choice3\nD) choice4\"."
+              "\n\nFor TRUE_FALSE questions, also list the 2 true/false options immediately following the topic, i.e. \"A) True\nB) False\"."
+              "\n\nOn the immediate next line, list the answer to the question, i.e.: \"Answer: A) True\" or \"Answer: choice1\". For CODING question answers, list the full code implementation in Python within triple apostrophes."
+              "\n\nEntire questions must be separated by a line with the text \"------DIVIDER------\" and nothing else."
+              "\n\nDo not generate the quiz if the topics are highly irrelevant to a machine learning course, i.e. \"Ponies\".")
 
                 # "\n\nNext to each question, list the question topic and type of question once, i.e.: \"5. Here is a question.\nTopic: topic1\nType: MULTIPLE_CHOICE\"."
                 # "\n\nMULTIPLE_CHOICE questions will list the answer choices immediately after the \"Type\" line with no whitespace, i.e.: \"A) choice1\nB) choice2\nC) choice3\nD) choice4\""
