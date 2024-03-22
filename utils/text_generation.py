@@ -22,7 +22,7 @@ def generate(input_str, system_prompt=None, chat_history_func=None, retriever=No
     elif retriever:
         return generate_with_docs(input_str, system_prompt, retriever)
     else:
-        return generate_base(input_str, system_prompt)
+        return generate_base(input_str, '' if system_prompt is None else system_prompt)
 
 
 def generate_base(input_str, system_prompt):
@@ -31,7 +31,7 @@ def generate_base(input_str, system_prompt):
                                                ("human", "{input}")])
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7, max_tokens=1024)
     chain = LLMChain(prompt=prompt, llm=llm)
-    message = chain.invoke(input_str)
+    message = chain.invoke({"input": input_str, "history": []})
     return message["text"].strip()
 
 
