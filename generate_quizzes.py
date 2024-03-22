@@ -137,7 +137,8 @@ def _parse_quiz(quiz, numQs, topics, types):
 
 def generate_quiz(numQs, types, topics, seeRawQuiz=False):
     '''Given a numer of question, question types, question topics, and a bool debugMode, generates and
-    returns a quiz using GPT. Takes 3 total attempts if the quiz is not formatted properly.
+    returns a quiz using GPT. Takes 3 total attempts if the quiz is not formatted properly, and will
+    ultimately return False if a proper quiz is not generated.
     
     If seeRawQuiz is true, prints the raw generated quiz independently, before trying parsing.'''
 
@@ -181,7 +182,10 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
         print(response)
 
     # parse quiz and return formatted JSON
-    body = _parse_quiz(response, numQs, topics, types)
+    try: # catch hard errors (logic errors handled in _parse_quiz)
+        body = _parse_quiz(response, numQs, topics, types)
+    except:
+        body = False
 
     # 2 retries if quiz is not formatted properly
     for i in range(2):
