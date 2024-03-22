@@ -42,8 +42,6 @@ def _parse_quiz(quiz, numQs, topics, types):
     # 4. ...
     ###############
 
-    print(quiz) # TODO:
-
     body = {"questions": []}
 
     # traverse each question
@@ -58,6 +56,7 @@ def _parse_quiz(quiz, numQs, topics, types):
 
         # traverse each line
         lines = section.split("\n")
+        within_answer = False # flag for handling multi-line answers (for coding questions)
         for line in lines:
 
             question_pattern = re.compile(r'\d+\.')
@@ -67,6 +66,8 @@ def _parse_quiz(quiz, numQs, topics, types):
             choices_pattern = re.compile(r'[A-D]\) ') # for MC questions specifically
 
             # search each line for applicable patterns
+            if within_answer: # for handling multi-line answers (for coding questions)
+                answer += line
             if question_pattern.search(line):
                 question = line.split(". ")[1]
             elif topic_pattern.search(line):
@@ -74,24 +75,22 @@ def _parse_quiz(quiz, numQs, topics, types):
             elif type_pattern.search(line):
                 type = line.split(": ")[1]
             elif answer_pattern.search(line):
-                answer = line.split("\n")[0]
+                within_answer = True
+                answer += line.split(": ")[1]
             elif choices_pattern.search(line):
                 choices += line.split(") ")[1] + ", "
 
         # check question-specific conditions of incorrect quiz format:
         # if question is MULTIPLE_CHOICE but does not have exactly 4 answer choices
         if (type == "MULTIPLE_CHOICE" and len(choices[:-2].split(",")) != 4):
-            print('ONEONEONE') # TODO:
             return False
         # if question is TRUE_FALSE but does not have exactly 2 answer choices
         if (type == "TRUE_FALSE" and len(choices[:-2].split(",")) != 2): # -2 to remove comma at end
             print(choices)
-            print("TWOTWOTWO") # TODO:
             return False
         # if question is not a valid type
         if type != "MULTIPLE_CHOICE" and type != "SHORT_ANSWER" and type != "CODING" and type != "TRUE_FALSE":
             print(type)
-            print("THREETHREETHREE") # TODO:
             return False
         # if question topic is not one of the specified topics
         topics_split = topics.split(",")
@@ -101,7 +100,6 @@ def _parse_quiz(quiz, numQs, topics, types):
             if topic.lower() == topic_split.lower(): # .lower to be case insensitive
                 validTopic = True
         if not validTopic:
-            print("FOURFOURFOUR") # TODO:
             return False
 
         # append question to JSON list
@@ -125,7 +123,6 @@ def _parse_quiz(quiz, numQs, topics, types):
 
     # if number of questions does not match number asked for in quiz generation
     if len(body["questions"]) != numQs:
-        print("FIVEFIVEFIVE") # TODO:
         print(len(body["questions"]))
         return False
     
@@ -159,7 +156,7 @@ def generate_quiz(numQs, types, topics, debugMode):
                     "\n\nTRUE_FALSE questions will list the true/false answer choices immediately after the \"Type\" line with no whitespace, similar to MULTIPLE_CHOICE. I.e.: \"Type: TRUE_FALSE\nA) True\nB) False\"."
                     "\n\nList the correct answer immediately after the answer choices (for MULTIPLE_CHOICE and TRUE_FALSE), or the question type (for SHORT_ANSWER and CODING), i.e. for MULTIPLE_CHOICE: \"D) choice4\nAnswer: "
                     "choice4\", and for all other question types, \"Type: free response\nAnswer: answer\". There should not be a blank line."
-                    '\n\nFor coding questions, ensure the \"Answer: ...\" provides the full code implementation in Python and within triple apostrophes. Do not put \"Python\" in the code and do not have any blank lines of whitespace.'
+                    '\n\nFor coding questions, ensure the \"Answer: ...\" provides the full code implementation in Python and within triple apostrophes.'
                     "\n\nDo not generate a quiz if the topics are not relevant to a machine learning course.")
     
     # RAG for embeddings similar to user-supplied topics
