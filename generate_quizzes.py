@@ -81,15 +81,15 @@ def _parse_quiz(quiz, numQs, topics, types):
                 within_answer = True
                 answer += line.split(": ")[1]
             elif choices_pattern.search(line):
-                choices += line.split(") ")[1] + ", "
+                choices += line.split(") ")[1] + "@"
 
         # check question-specific conditions of incorrect quiz format:
         # if question is MULTIPLE_CHOICE but does not have exactly 4 answer choices
-        if (type == "MULTIPLE_CHOICE" and len(choices[:-2].split(",")) != 4):
+        if (type == "MULTIPLE_CHOICE" and len(choices[:-2].split("@")) != 4):
             print('ERROR: mc question does not have exactly 4 choices\nCHOICES: ' + choices + '\nQUIZ:\n' + quiz)
             return False
         # if question is TRUE_FALSE but does not have exactly 2 answer choices
-        if (type == "TRUE_FALSE" and len(choices[:-2].split(",")) != 2): # -2 to remove comma at end
+        if (type == "TRUE_FALSE" and len(choices[:-2].split("@")) != 2): # -2 to remove comma at end
             print('ERROR: tf question does not have exactly 2 choices\nCHOICES: ' + choices + '\nQUIZ:\n' + quiz)
             return False
         # if question is not a valid type
@@ -112,7 +112,7 @@ def _parse_quiz(quiz, numQs, topics, types):
                 "type": type,
                 "question": question,
                 "topics": topics,
-                "choices": choices[:-2], # -2 to remove comma at end
+                "choices": choices[:-2], # -2 to remove '@' at end
                 "answer": answer
             })
         else:
