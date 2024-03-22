@@ -184,7 +184,8 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
     # parse quiz and return formatted JSON
     try: # catch hard errors (logic errors handled in _parse_quiz)
         body = _parse_quiz(response, numQs, topics, types)
-    except:
+    except Exception as e:
+        print("ERROR: caught exception in parsing quiz: " + str(e))
         body = False
 
     # 2 retries if quiz is not formatted properly
