@@ -116,6 +116,7 @@ def _parse_quiz(quiz, numQs, topics, types):
                 "type": type,
                 "question": question,
                 "topics": topics,
+                "choices": None,
                 "answer": answer
             })
 
