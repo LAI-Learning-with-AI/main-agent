@@ -196,3 +196,10 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
             body = _parse_quiz(response, numQs, topics, types)
 
     return body
+
+
+
+def grade_frq(questions):
+    '''Takes formatted JSON of FRQs and the total number of quiz questions, grades the FRQs, and returns a final quiz grade.'''
+
+    # code here
