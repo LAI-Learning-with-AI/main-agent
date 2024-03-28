@@ -3,6 +3,7 @@
 from better_profanity import profanity
 from datetime import datetime
 import os
+
 # Fix errors when importing locally versus as submodule
 if __package__ is None or __package__ == '':
     from agent import Agent
@@ -12,7 +13,17 @@ else:
     from .utils.vectorstore import load_vectorstore
 
 from dotenv import load_dotenv
+
 load_dotenv()
+
+
+def get_vectorstore():
+    return load_vectorstore(database="postgres", password=os.getenv("POSTGRESQL_PASSWORD"),
+                            collection_name="corpus")
+
+
+def get_retriever():
+    return get_vectorstore().as_retriever()
 
 
 # debug = True
@@ -36,10 +47,7 @@ def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_message
                    "CONTEXT, say \"I can't find a resource to help with that.\"")
 
     # Load Vector Store
-    vectorstore = load_vectorstore(database="postgres", password=os.getenv("POSTGRESQL_PASSWORD"),
-                                   collection_name="corpus")
-    # search_result = vectorstore.search("AI", "similarity")
-    retriever = vectorstore.as_retriever()
+    retriever = get_retriever()
 
     agent = Agent(name, description)
 
@@ -66,12 +74,13 @@ def run_chat(userid="9999", chatid="9999", message="NOMESSAGE", previous_message
 
                 # response_docs = agent.respond_with_docs(prompt_meta, user_name, user_description, censored_input, retriever)
                 # response_base = agent.respond(prompt_meta, user_name, user_description, censored_input)
-                response_docs_and_history = agent.respond_with_docs_and_history(system_prompt, user_name, user_description,
-                                                                                censored_input, retriever, previous_messages)
+                response_docs_and_history = agent.respond_with_docs_and_history(system_prompt, user_name,
+                                                                                user_description,
+                                                                                censored_input, retriever,
+                                                                                previous_messages)
                 # print(f"============Agent Response============\n{response_base}\n\n")
                 # print(f"============Agent Response w/Docs============\n{response_docs}\n\n")
                 print(f"============Agent Response w/Docs&History============\n{response_docs_and_history}\n\n")
-
 
                 # TODO: Refactor reflection system to be better suited to the learning process (reflect on what the
                 #  student struggles with) Reflect on memories
