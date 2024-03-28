@@ -148,7 +148,7 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
     name = "Quiz Generation AI"
     description = ("You are Quiz Generation AI. Quiz Generation AI is given a number of quiz questions, quiz topics, and quiz question "
                    "types from which to generate a quiz.")
-
+    
     agent = Agent(name, description)
 
     prompt = ("Make a quiz with exactly " + str(numQs) + "questions on the following question topics: " + topics + ", and only "
@@ -199,7 +199,37 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
 
 
 
-def grade_frq(questions):
-    '''Takes formatted JSON of FRQs and the total number of quiz questions, grades the FRQs, and returns a final quiz grade.'''
+def grade_quiz(questions):
+    '''Takes formatted JSON quiz, grades all questions, and returns [total quiz score out of 1, [scores for each FRQ out of 1]].'''
 
-    # code here
+    num_mc = len(questions)
+
+    # model setup
+    name = "Quiz Grader"
+    description = ("You are Quiz Grader. Quiz Grader is given a question, a ground truth answer, and a user-supplied answer. Quiz Grader evaluates the user-supplied answer.")
+    agent = Agent(name, description)
+
+    # grade all questions
+    question_scores = []
+    for question in questions:
+
+        # grade 0 or 1 for MULTIPLE_CHOICE and TRUE_FALSE questions
+        if question["type"] == "MULTIPLE_CHOICE" or question["type"] == "TRUE_FALSE":
+            if question["answer"] == question["user_answer"]:
+                question_scores.append(1)
+            else:
+                question_scores.append(0)
+            continue
+
+        # grade [0, 1] for SHORT_ANSWER and CODING questions
+        # TODO: figure out how to grade CODING questions, add functionality here (whether that is external tooling or more prompting)
+        prompt = ("Given the following question, ground truth question, and user-supplied answer, score the user-supplied answer on a scale of 0 to 1 based on the "
+                  "similarity of the user-supplied answer to the ground truth answer. Only return the score, with no other text."
+                  "\n\nQuestion: " + question["question"] + "\n\nGround truth answer: " + question["answer"] + "\n\nUser-supplied answer: " + question["user_answer"])
+        str_score = agent.respond(description, "miscellaneous student", "", prompt)
+        question_scores.append(float(str_score))
+
+    # get final score
+    final_score = sum(question_scores) / num_mc
+
+    return final_score, question_scores

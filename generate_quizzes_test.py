@@ -10,10 +10,12 @@ else:
     from .agent import Agent
     from .utils.vectorstore import load_vectorstore
 
+# ======== TEST QUIZ GEN ========
+
 # json = generate_quiz(10, 'MULTIPLE_CHOICE, SHORT_ANSWER', 'ensemble learning, dimensionality reduction', True)
 # print(json)
 
-# testing RAG vs. no RAG
+# ======== TEST RAG VS. NO RAG RESPONSE ========
 
 question = 'Please explain the kernel trick in terms of Support Vector Machines and how it allows for producing a discriminant in an infinitely-high dimensional space.'
 myAgent = Agent('', '')
@@ -26,3 +28,6 @@ response2 = myAgent.respond_with_docs('', '', '', question, retriever)
 
 print('\n====== RESPONSE 1: ======\n' + response1)
 print('\n====== RESPONSE 2: ======\n' + response2)
+
+# ======== TEST QUIZ GRADING ========
+# TODO:
