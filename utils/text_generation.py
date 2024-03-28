@@ -29,14 +29,14 @@ def generate_base(input_str, system_prompt):
     prompt = ChatPromptTemplate.from_messages([("system", system_prompt),
                                                MessagesPlaceholder(variable_name="history"),
                                                ("human", "{input}")])
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7, max_tokens=1024)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
     chain = LLMChain(prompt=prompt, llm=llm)
     message = chain.invoke({"input": input_str, "history": []})
     return message["text"].strip()
 
 
 def generate_with_docs(input_str, system_prompt, retriever):
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7, max_tokens=1024)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
     combine_docs_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)
     retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
@@ -48,7 +48,7 @@ def generate_with_history(input_str, system_prompt, chat_history_func):
     prompt = ChatPromptTemplate.from_messages([("system", system_prompt),
                                                MessagesPlaceholder(variable_name="history"),
                                                ("human", "{input}")])
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7, max_tokens=1024)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
     chain = LLMChain(prompt=prompt, llm=llm)
     with_message_history = RunnableWithMessageHistory(chain, chat_history_func, input_messages_key='input',
                                                       history_messages_key='history', output_messages_key='text')
@@ -57,7 +57,7 @@ def generate_with_history(input_str, system_prompt, chat_history_func):
 
 
 def generate_with_docs_and_history(input_str, system_prompt, retriever, chat_history_func):
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7, max_tokens=1024)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
     combine_docs_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)
     retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
