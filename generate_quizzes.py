@@ -111,7 +111,7 @@ def _parse_quiz(quiz, numQs, topics, types):
             body["questions"].append({
                 "type": type,
                 "question": question,
-                "topics": topics,
+                "topics": topic,
                 "choices": choices[:-2], # -2 to remove '@' at end
                 "answer": answer
             })
@@ -119,7 +119,7 @@ def _parse_quiz(quiz, numQs, topics, types):
             body["questions"].append({
                 "type": type,
                 "question": question,
-                "topics": topics,
+                "topics": topic,
                 "choices": None,
                 "answer": answer
             })
