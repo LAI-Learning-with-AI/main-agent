@@ -200,13 +200,14 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
 
 
 def grade_quiz(questions):
-    '''Takes formatted JSON quiz, grades all questions, and returns [total quiz score out of 1, [scores for each FRQ out of 1]].'''
+    '''Takes formatted JSON quiz and debugMode, grades all questions, and returns [total quiz score out of 1, [scores for each FRQ out of 1]].'''
 
     num_mc = len(questions)
 
     # model setup
     name = "Quiz Grader"
-    description = ("You are Quiz Grader. Quiz Grader is given a question, a ground truth answer, and a user-supplied answer. Quiz Grader evaluates the user-supplied answer.")
+    description = ("You are Quiz Grader. Quiz Grader is given a question related to machine learning, a ground truth answer, and a user-supplied answer. Quiz Grader "
+                   "evaluates the user-supplied answer.")
     agent = Agent(name, description)
 
     # grade all questions
@@ -214,7 +215,7 @@ def grade_quiz(questions):
     for question in questions:
 
         # grade 0 or 1 for MULTIPLE_CHOICE and TRUE_FALSE questions
-        if question["type"] == "MULTIPLE_CHOICE" or question["type"] == "TRUE_FALSE":
+        if question["question_type"] == "MULTIPLE_CHOICE" or question["question_type"] == "TRUE_FALSE":
             if question["answer"] == question["user_answer"]:
                 question_scores.append(1)
             else:
@@ -223,9 +224,10 @@ def grade_quiz(questions):
 
         # grade [0, 1] for SHORT_ANSWER and CODING questions
         # TODO: figure out how to grade CODING questions, add functionality here (whether that is external tooling or more prompting)
-        prompt = ("Given the following question, ground truth question, and user-supplied answer, score the user-supplied answer on a scale of 0 to 1 based on the "
-                  "similarity of the user-supplied answer to the ground truth answer. Only return the score, with no other text."
-                  "\n\nQuestion: " + question["question"] + "\n\nGround truth answer: " + question["answer"] + "\n\nUser-supplied answer: " + question["user_answer"])
+        prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answer"] + "\n\nHere is a user-supplied"
+                  "answer to the question: " + question["user_answer"] + "\n\nScore the user-supplied answer on a continuous scale of 0.0 to 1.0 based on how correct it is. "
+                  "A user-supplied answer that does not mention the main points of the optimal answer should receive a score of 0.0. A user-supplied answer that mentions all the"
+                  "main points of the optimal answer should receive a score of 1.0. Only return the score with no other text.")
         str_score = agent.respond(description, "miscellaneous student", "", prompt)
         question_scores.append(float(str_score))
 
