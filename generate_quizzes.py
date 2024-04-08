@@ -216,7 +216,7 @@ def grade_quiz(questions):
 
         # MULTIPLE_CHOICE and TRUE_FALSE: grade 0 or 1
         if question["type"] == "MULTIPLE_CHOICE" or question["type"] == "TRUE_FALSE":
-            if question["answer"] == question["user_answer"]:
+            if question["answers"] == question["user_answer"]:
                 question_scores.append(1)
             else:
                 question_scores.append(0)
