@@ -2,6 +2,7 @@ from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from better_profanity import profanity
 import os
 import re
+import requests
 
 # fix errors when importing locally versus as submodule
 if __package__ is None or __package__ == '':
@@ -206,15 +207,14 @@ def grade_quiz(questions):
 
     # model setup
     name = "Quiz Grader"
-    description = ("You are Quiz Grader. Quiz Grader is given a question related to machine learning, a ground truth answer, and a user-supplied answer. Quiz Grader "
-                   "evaluates the user-supplied answer.")
+    description = ("You are Quiz Grader. Quiz Grader helps grade free response questions.")
     agent = Agent(name, description)
 
     # grade all questions
     question_scores = []
     for question in questions:
 
-        # grade 0 or 1 for MULTIPLE_CHOICE and TRUE_FALSE questions
+        # MULTIPLE_CHOICE and TRUE_FALSE: grade 0 or 1
         if question["question_type"] == "MULTIPLE_CHOICE" or question["question_type"] == "TRUE_FALSE":
             if question["answer"] == question["user_answer"]:
                 question_scores.append(1)
@@ -222,14 +222,51 @@ def grade_quiz(questions):
                 question_scores.append(0)
             continue
 
-        # grade [0, 1] for SHORT_ANSWER and CODING questions
-        # TODO: figure out how to grade CODING questions, add functionality here (whether that is external tooling or more prompting)
-        prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answer"] + "\n\nHere is a user-supplied"
-                  "answer to the question: " + question["user_answer"] + "\n\nScore the user-supplied answer on a continuous scale of 0.0 to 1.0 based on how correct it is. "
-                  "A user-supplied answer that does not mention the main points of the optimal answer should receive a score of 0.0. A user-supplied answer that mentions all the"
-                  "main points of the optimal answer should receive a score of 1.0. Only return the score with no other text.")
-        str_score = agent.respond(description, "miscellaneous student", "", prompt)
-        question_scores.append(float(str_score))
+        # SHORT_ANSWER: grade [0, 1]
+        if question["question_type"] == "SHORT_ANSWER":
+            # TODO: option 1
+            # prompt1 = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answer"] + "\n\nFrom the optimal answer, "
+            #         "split it up into its logical points and return them line by line, i.e. \"- Here is point 1.\n- Here is point 2.\". Only return the points with no other text.")
+            # answer_points = agent.respond(description, "miscellaneous student", "", prompt1)
+            # prompt2 = ("You will be provided with text delimited by triple quotes that is supposed to be the answer to a question. Check if the following pieces of information "
+            #         "are directly contained in the answer:\n\n" + answer_points + "\n\nFor each piece of information, consider if someone reading the text who doesn't know the topic "
+            #         "could directly infer the point. Count \"yes\" if the answer is yes, otherwise count \"no\". Only return the ratio of \"yes\" to the total number of points, and "
+            #         "no other text, i.e. \"0.75\".\n\n\"\"\"" + question["user_answer"] + "\"\"\"")
+            # score = float(agent.respond(description, "miscellaneous student", "", prompt2))
+
+            # TODO: option 2
+            prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answer"] + "\n\nHere is a user-supplied"
+                    "answer to the question: " + question["user_answer"] + "\n\nScore the user-supplied answer on a continuous scale of 0.0 to 1.0 based on how correct it is. "
+                    "A user-supplied answer that does not mention the main points of the optimal answer should receive a score of 0.0. A user-supplied answer that mentions all the"
+                    "main points of the optimal answer should receive a score of 1.0. Only return the score with no other text.")
+            score = float(agent.respond(description, "miscellaneous student", "", prompt))
+
+        # CODING: grade [0, 1]
+        if question["question_type"] == "CODING":
+
+            # grade whether it ran
+            url="http://localhost:5002/runcode"
+            payload = {'code': question["user_answer"]}
+            headers = {'Content-Type': 'application/json'}
+            try:
+                response = requests.post(url, json=payload, headers=headers)
+                if response.status_code == 200:
+                    ran_score = 0.5
+                else:
+                    ran_score = 0
+            except Exception as e:
+                raise Exception("ERROR: caught exception in grading coding question: " + str(e))
+            
+            # grade general syntax
+            # TODO: option 2
+            prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal code to answer the question:" + question["answer"] + "\n\nHere is the user-supplied "
+            "code to answer the question: " + question["user_answer"] + "\n\nScore the user-supplied code on a continuous scale of 0.0 to 0.5 based on how correct it is. Correct code "
+            "will perform the same basic function as the optimal code, but may not be exactly the same. Only return the score with no other text.")
+            syntax_score = float(agent.respond(description, "miscellaneous student", "", prompt))
+
+            score = ran_score + syntax_score
+
+        question_scores.append(score)
 
     # get final score
     final_score = sum(question_scores) / num_mc

@@ -60,6 +60,13 @@ test_quiz = [
         "question_type": "SHORT_ANSWER",
         "answer": "A very small slack variable weight will result in a hard-margin SVM, which will attempt to perfectly separate the data points.",
         "user_answer": "A very small slack variable weight will allow more misclassifications, softening the margin.",
+    },
+    {
+        "questionID": "0005",
+        "question": "What is the code to print the number 5 in Python?",
+        "question_type": "CODING",
+        "answer": "print(5)",
+        "user_answer": "print(5)",
     }
 ]
 
