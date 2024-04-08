@@ -215,7 +215,7 @@ def grade_quiz(questions):
     for question in questions:
 
         # MULTIPLE_CHOICE and TRUE_FALSE: grade 0 or 1
-        if question["question_type"] == "MULTIPLE_CHOICE" or question["question_type"] == "TRUE_FALSE":
+        if question["type"] == "MULTIPLE_CHOICE" or question["type"] == "TRUE_FALSE":
             if question["answer"] == question["user_answer"]:
                 question_scores.append(1)
             else:
@@ -223,9 +223,9 @@ def grade_quiz(questions):
             continue
 
         # SHORT_ANSWER: grade [0, 1]
-        if question["question_type"] == "SHORT_ANSWER":
+        if question["type"] == "SHORT_ANSWER":
             # TODO: option 1
-            # prompt1 = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answer"] + "\n\nFrom the optimal answer, "
+            # prompt1 = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answers"] + "\n\nFrom the optimal answer, "
             #         "split it up into its logical points and return them line by line, i.e. \"- Here is point 1.\n- Here is point 2.\". Only return the points with no other text.")
             # answer_points = agent.respond(description, "miscellaneous student", "", prompt1)
             # prompt2 = ("You will be provided with text delimited by triple quotes that is supposed to be the answer to a question. Check if the following pieces of information "
@@ -235,14 +235,14 @@ def grade_quiz(questions):
             # score = float(agent.respond(description, "miscellaneous student", "", prompt2))
 
             # TODO: option 2
-            prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answer"] + "\n\nHere is a user-supplied"
+            prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answers"] + "\n\nHere is a user-supplied"
                     "answer to the question: " + question["user_answer"] + "\n\nScore the user-supplied answer on a continuous scale of 0.0 to 1.0 based on how correct it is. "
                     "A user-supplied answer that does not mention the main points of the optimal answer should receive a score of 0.0. A user-supplied answer that mentions all the"
                     "main points of the optimal answer should receive a score of 1.0. Only return the score with no other text.")
             score = float(agent.respond(description, "miscellaneous student", "", prompt))
 
         # CODING: grade [0, 1]
-        if question["question_type"] == "CODING":
+        if question["type"] == "CODING":
 
             # grade whether it ran
             url="http://localhost:5002/runcode"
@@ -259,7 +259,7 @@ def grade_quiz(questions):
             
             # grade general syntax
             # TODO: option 2
-            prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal code to answer the question:" + question["answer"] + "\n\nHere is the user-supplied "
+            prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal code to answer the question:" + question["answers"] + "\n\nHere is the user-supplied "
             "code to answer the question: " + question["user_answer"] + "\n\nScore the user-supplied code on a continuous scale of 0.0 to 0.5 based on how correct it is. Correct code "
             "will perform the same basic function as the optimal code, but may not be exactly the same. Only return the score with no other text.")
             syntax_score = float(agent.respond(description, "miscellaneous student", "", prompt))
