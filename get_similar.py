@@ -16,11 +16,7 @@ def get_similar(topics: list[str], max_per_topic: int = 5) -> list:
                           collection_name="corpus")
 
     for t in topics:
-        search = list({item.metadata["source"]: None for item in vs.search(t, "mmr", k=max_per_topic)}.keys())
+        search = [item.metadata for item in vs.search(t, "mmr", k=max_per_topic)]
         result.append({t: search})
-
-    # for each item in result, add metadata["source"] to body["resources"] using list comprehension
-    # only adding unique sources
-    #result = list({item.metadata["source"]: None for item in result}.keys())
 
     return result
