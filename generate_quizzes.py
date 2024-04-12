@@ -113,7 +113,7 @@ def _parse_quiz(quiz, numQs, topics, types):
                 "type": type,
                 "question": question,
                 "topics": topic,
-                "choices": choices[:-2], # -2 to remove '@' at end
+                "choices": choices[:-1], # -2 to remove '@' at end
                 "answer": answer
             })
         else:
