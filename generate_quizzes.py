@@ -1,6 +1,7 @@
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from better_profanity import profanity
 import os
+import json
 import re
 import requests
 
@@ -201,7 +202,7 @@ def generate_quiz(numQs, types, topics, seeRawQuiz=False):
 
 
 def grade_quiz(questions):
-    '''Takes formatted JSON quiz and debugMode, grades all questions, and returns [total quiz score out of 1, [scores for each FRQ out of 1]].'''
+    '''Takes formatted JSON quiz and debugMode, grades all questions, and returns [total quiz score out of 1, [scores for each FRQ out of 1], [errors for each question if CODING]].'''
 
     num_mc = len(questions)
 
@@ -212,7 +213,10 @@ def grade_quiz(questions):
 
     # grade all questions
     question_scores = []
+    code_errors = [] # errors from running CODING questions...None if no errors or not applicable to question type
     for question in questions:
+
+        errors = None
 
         # MULTIPLE_CHOICE and TRUE_FALSE: grade 0 or 1
         if question["type"] == "MULTIPLE_CHOICE" or question["type"] == "TRUE_FALSE":
@@ -224,7 +228,7 @@ def grade_quiz(questions):
 
         # SHORT_ANSWER: grade [0, 1]
         if question["type"] == "SHORT_ANSWER":
-            # TODO: option 1
+            # TODO: decide option 1 or option 2
             # prompt1 = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answers"] + "\n\nFrom the optimal answer, "
             #         "split it up into its logical points and return them line by line, i.e. \"- Here is point 1.\n- Here is point 2.\". Only return the points with no other text.")
             # answer_points = agent.respond(description, "miscellaneous student", "", prompt1)
@@ -234,7 +238,7 @@ def grade_quiz(questions):
             #         "no other text, i.e. \"0.75\".\n\n\"\"\"" + question["user_answer"] + "\"\"\"")
             # score = float(agent.respond(description, "miscellaneous student", "", prompt2))
 
-            # TODO: option 2
+            # TODO: decide option 1 or option 2
             prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answers"] + "\n\nHere is a user-supplied"
                     "answer to the question: " + question["user_answer"] + "\n\nScore the user-supplied answer on a continuous scale of 0.0 to 1.0 based on how correct it is. "
                     "A user-supplied answer that does not mention the main points of the optimal answer should receive a score of 0.0. A user-supplied answer that mentions all the"
@@ -244,31 +248,47 @@ def grade_quiz(questions):
         # CODING: grade [0, 1]
         if question["type"] == "CODING":
 
+            score_ratio = 0.8 # 0.8 from syntax, 0.2 from running
+
             # grade whether it ran
             url="http://localhost:5002/runcode"
             payload = {'code': question["user_answer"]}
             headers = {'Content-Type': 'application/json'}
             try:
-                response = requests.post(url, json=payload, headers=headers)
-                if response.status_code == 200:
-                    ran_score = 0.5
+                response = json.loads(requests.post(url, json=payload, headers=headers).text) # converts request to text, then parses back to JSON (instead of a Response obj)
+                errors = response["errors"]
+                
+                # print debugging info
+                print("Code Question Running - Status:")
+                print("ran: ", response["ran"])
+                print("errors: ", errors)
+                print("status_code: ", response["status_code"], "\n")
+
+                if response["status_code"] == 200:
+                    ran_score = 1 - score_ratio
                 else:
                     ran_score = 0
+
             except Exception as e:
                 raise Exception("ERROR: caught exception in grading coding question: " + str(e))
             
             # grade general syntax
-            # TODO: option 2
+            # TODO: decide option 1 or option 2
             prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal code to answer the question:" + question["answers"] + "\n\nHere is the user-supplied "
-            "code to answer the question: " + question["user_answer"] + "\n\nScore the user-supplied code on a continuous scale of 0.0 to 0.5 based on how correct it is. Correct code "
-            "will perform the same basic function as the optimal code, but may not be exactly the same. Only return the score with no other text.")
+            "code to answer the question: " + question["user_answer"] + "\n\nScore the user-supplied code on a continuous scale of 0.0 to " + str(score_ratio) + "based on how correct it is. "
+            "Correct code will perform the same basic function as the optimal code, but may not be exactly the same. Only return the score with no other text.")
             syntax_score = float(agent.respond(description, "miscellaneous student", "", prompt))
 
             score = ran_score + syntax_score
 
+        # append question score and (if applicable) errors
         question_scores.append(score)
+        if errors == "" or errors == None:
+            code_errors.append(None)
+        else:
+            code_errors.append(errors)
 
     # get final score
     final_score = sum(question_scores) / num_mc
 
-    return final_score, question_scores
+    return final_score, question_scores, code_errors

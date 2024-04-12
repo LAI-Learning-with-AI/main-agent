@@ -36,39 +36,40 @@ test_quiz = [
     {
         "questionID": "0001",
         "question": "A Lasso regularizer acts as a feature selector.",
-        "question_type": "TRUE_FALSE",
-        "answer": "True",
+        "type": "TRUE_FALSE",
+        "answers": "True",
         "user_answer": "True",
     },
     {
         "questionID": "0002",
         "question": "Neural networks are more interpretable than linear regression.",
-        "question_type": "TRUE_FALSE",
-        "answer": "False",
+        "type": "TRUE_FALSE",
+        "answers": "False",
         "user_answer": "True",
     },
     {
         "questionID": "0003",
         "question": "What is the difference between L1 and L2 regularization?",
-        "question_type": "SHORT_ANSWER",
-        "answer": "L1 regularization penalizes the absolute value of the coefficients, while L2 regularization penalizes the square of the coefficients. L1 regularization can perform feature selection, while L2 regularization shrinks coefficients faster, but rarely eliminates them entirely.",
+        "type": "SHORT_ANSWER",
+        "answers": "L1 regularization penalizes the absolute value of the coefficients, while L2 regularization penalizes the square of the coefficients. L1 regularization can perform feature selection, while L2 regularization shrinks coefficients faster, but rarely eliminates them entirely.",
         "user_answer": "L2 regularization is based on the absolute value of the coefficients, while L2 regularization is based on the square of the coefficients. An L2 regularizer penalizes the weights harsher than L1, while L1 tends to trend unnecessary feature weights to 0 and perform feature selection.",
     },
     {
         "questionID": "0004",
         "question": "In soft-margin SVM, what is the result of utilizing a very small slack variable weight?",
-        "question_type": "SHORT_ANSWER",
-        "answer": "A very small slack variable weight will result in a hard-margin SVM, which will attempt to perfectly separate the data points.",
+        "type": "SHORT_ANSWER",
+        "answers": "A very small slack variable weight will result in a hard-margin SVM, which will attempt to perfectly separate the data points.",
         "user_answer": "A very small slack variable weight will allow more misclassifications, softening the margin.",
     },
     {
         "questionID": "0005",
         "question": "What is the code to print the number 5 in Python?",
-        "question_type": "CODING",
-        "answer": "print(5)",
+        "type": "CODING",
+        "answers": "print(5)",
         "user_answer": "print(5)",
     }
 ]
 
-grade = grade_quiz(test_quiz)
-print(grade)
+grade = grade_quiz(test_quiz) # calls grade_quiz func which in turn calls HTTP route for grading code (usually grade_quiz called within overarching Flask HTTP route)
+print("(final grade, [question grades])")
+print(grade, "\n")
