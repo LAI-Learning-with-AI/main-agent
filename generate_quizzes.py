@@ -228,22 +228,25 @@ def grade_quiz(questions):
 
         # SHORT_ANSWER: grade [0, 1]
         if question["type"] == "SHORT_ANSWER":
-            # TODO: decide option 1 or option 2
-            # prompt1 = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answers"] + "\n\nFrom the optimal answer, "
-            #         "split it up into its logical points and return them line by line, i.e. \"- Here is point 1.\n- Here is point 2.\". Only return the points with no other text.")
-            # answer_points = agent.respond(description, "miscellaneous student", "", prompt1)
-            # prompt2 = ("You will be provided with text delimited by triple quotes that is supposed to be the answer to a question. Check if the following pieces of information "
-            #         "are directly contained in the answer:\n\n" + answer_points + "\n\nFor each piece of information, consider if someone reading the text who doesn't know the topic "
-            #         "could directly infer the point. Count \"yes\" if the answer is yes, otherwise count \"no\". Only return the ratio of \"yes\" to the total number of points, and "
-            #         "no other text, i.e. \"0.75\".\n\n\"\"\"" + question["user_answer"] + "\"\"\"")
-            # score = float(agent.respond(description, "miscellaneous student", "", prompt2))
 
-            # TODO: decide option 1 or option 2
-            prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answers"] + "\n\nHere is a user-supplied"
-                    "answer to the question: " + question["user_answer"] + "\n\nScore the user-supplied answer on a continuous scale of 0.0 to 1.0 based on how correct it is. "
-                    "A user-supplied answer that does not mention the main points of the optimal answer should receive a score of 0.0. A user-supplied answer that mentions all the"
-                    "main points of the optimal answer should receive a score of 1.0. Only return the score with no other text.")
-            score = float(agent.respond(description, "miscellaneous student", "", prompt))
+            prompt1 = ("Here is a question: " + question["question"] + "\n\nHere is the optimal answer to the question:" + question["answers"] + "\n\nFrom the optimal answer, "
+                    "split it up into its logical points and return them line by line, i.e. \"- Here is point 1.\n- Here is point 2.\". Only return the points with no other text.")
+            answer_points = agent.respond(description, "miscellaneous student", "", prompt1)
+            prompt2 = ("You will be provided with text delimited by triple quotes that is the answer to a question. Check if the following pieces of information "
+                    "are mentioned in the answer:\n\n" + answer_points + "\n\nFor each piece of information, return a comma-separated \"yes\" if it is mentioned in the "
+                    "answer or a comma-separated \"no\" if it is not mentioned in the answer I.e., if 3 out of 4 points are mentioned in the answer, return \"yes, yes, yes, no\". "
+                    "Be lenient. Do not return any other text."
+                    "\n\n\"\"\"" + question["user_answer"] + "\"\"\"")
+            
+            best_score = 0.0
+            for i in range(3):
+                response = agent.respond(description, "miscellaneous student", "", prompt2)
+                score = float(response.replace(' ', '').split(',').count("yes")) / float(len(response.replace(' ', '').split(',')))
+                if score > best_score:
+                    best_score = score
+
+            # print(answer_points)
+            # print(response, '\n')
 
         # CODING: grade [0, 1]
         if question["type"] == "CODING":
@@ -273,10 +276,9 @@ def grade_quiz(questions):
                 raise Exception("ERROR: caught exception in grading coding question: " + str(e))
             
             # grade general syntax
-            # TODO: decide option 1 or option 2
-            prompt = ("Here is a question: " + question["question"] + "\n\nHere is the optimal code to answer the question:" + question["answers"] + "\n\nHere is the user-supplied "
-            "code to answer the question: " + question["user_answer"] + "\n\nScore the user-supplied code on a continuous scale of 0.0 to " + str(score_ratio) + "based on how correct it is. "
-            "Correct code will perform the same basic function as the optimal code, but may not be exactly the same. Only return the score with no other text.")
+            prompt = ("You will be provided with text delimited by triple quotes that is a user's code answer to a coding question. Compare the user code to the following optimal "
+                      "code answer that is delimited by double quotes:\n\n\"\"" + question["user_answer"] + "\"\"\n\nScore the user-supplied code on a continuous scale of 0.0 "
+                      "to " + str(score_ratio) + " based on whether it performs the same key functionality as the optimal code. Only return the score with no other text.")
             syntax_score = float(agent.respond(description, "miscellaneous student", "", prompt))
 
             score = ran_score + syntax_score

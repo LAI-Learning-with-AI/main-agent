@@ -71,5 +71,5 @@ test_quiz = [
 ]
 
 grade = grade_quiz(test_quiz) # calls grade_quiz func which in turn calls HTTP route for grading code (usually grade_quiz called within overarching Flask HTTP route)
-print("(final grade, [question grades])")
+print("(final grade, [question grades], [code errors])")
 print(grade, "\n")
