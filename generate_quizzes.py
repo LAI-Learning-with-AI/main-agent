@@ -239,7 +239,7 @@ def grade_quiz(questions):
                     "\n\n\"\"\"" + question["user_answer"] + "\"\"\"")
             
             best_score = 0.0
-            for i in range(3):
+            for i in range(3): # 3 attempts for grading, takes highest score
                 response = agent.respond(description, "miscellaneous student", "", prompt2)
                 score = float(response.replace(' ', '').split(',').count("yes")) / float(len(response.replace(' ', '').split(',')))
                 if score > best_score:
