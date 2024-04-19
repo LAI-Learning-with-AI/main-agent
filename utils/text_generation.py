@@ -25,18 +25,18 @@ def generate(input_str, system_prompt=None, chat_history_func=None, retriever=No
         return generate_base(input_str, '' if system_prompt is None else system_prompt)
 
 
-def generate_base(input_str, system_prompt):
+def generate_base(input_str, system_prompt, temperature=0.7):
     prompt = ChatPromptTemplate.from_messages([("system", system_prompt),
                                                MessagesPlaceholder(variable_name="history"),
                                                ("human", "{input}")])
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=temperature)
     chain = LLMChain(prompt=prompt, llm=llm)
     message = chain.invoke({"input": input_str, "history": []})
     return message["text"].strip()
 
 
-def generate_with_docs(input_str, system_prompt, retriever):
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
+def generate_with_docs(input_str, system_prompt, retriever, temperature=0.7):
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=temperature)
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
     combine_docs_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)
     retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
