@@ -28,7 +28,7 @@ class Agent:
     # TODO: Functionality for per session chat history
 
     # DEPRECATED
-    def respond(self, prompt_meta, user_name, user_description, user_input):
+    def respond(self, prompt_meta, user_name, user_description, user_input, temperature=0.7):
         recent_history_limit = 4
         now = datetime.now()
 
@@ -43,7 +43,7 @@ class Agent:
         # prompt += f" You know the following about {user_name}: {user_description}"
 
         # prompt += f"{user_name}: {user_input}\nResponse: "
-        response = generate(user_input, prompt_meta.format(prompt))
+        response = generate(user_input, prompt_meta.format(prompt), temperature=temperature)
 
         if debug: print(f"============Agent Prompt============\n{prompt}\n\n")
 
@@ -51,12 +51,12 @@ class Agent:
         self.history.append(f"{self.name}: {response}")
         return response
 
-    def respond_with_docs(self, prompt_meta, user_name, user_description, user_input, retriever):
+    def respond_with_docs(self, prompt_meta, user_name, user_description, user_input, retriever, temperature=0.7):
         recent_history_limit = 4
         now = datetime.now()
 
         prompt = f"You are {self.name}. {self.description} It is currently {now}. You are interacting with {user_name}. "
-        response = generate(user_input, prompt_meta.format(prompt), retriever=retriever)
+        response = generate(user_input, prompt_meta.format(prompt), retriever=retriever, temperature=temperature)
 
         if debug: print(f"============Agent Prompt============\n{prompt}\n\n")
 
@@ -64,7 +64,7 @@ class Agent:
         self.history.append(f"{self.name}: {response}")
         return response
 
-    def respond_with_docs_and_history(self, system_prompt, user_name, user_description, user_input, retriever, messages):
+    def respond_with_docs_and_history(self, system_prompt, user_name, user_description, user_input, retriever, messages, temperature=0.7):
         prompt = f"You are {self.name}. {self.description} You are interacting with {user_name}. "
 
         # Build chat history
@@ -78,7 +78,7 @@ class Agent:
         def get_chat_history(session_id: str = None):
             return chat_history
 
-        response = generate(user_input, system_prompt.format(prompt), get_chat_history, retriever)
+        response = generate(user_input, system_prompt.format(prompt), get_chat_history, retriever, temperature=temperature)
 
         if debug: print(f"============Chat History============\n{get_chat_history()}\n\n")
         if debug: print(f"============Agent Prompt============\n{prompt}\n\n")
