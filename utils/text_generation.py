@@ -14,29 +14,29 @@ import re
 load_dotenv()
 
 
-def generate(input_str, system_prompt=None, chat_history_func=None, retriever=None):
+def generate(input_str, system_prompt=None, chat_history_func=None, retriever=None, temperature=0.7):
     if chat_history_func and retriever:
-        return generate_with_docs_and_history(input_str, system_prompt, retriever, chat_history_func)
+        return generate_with_docs_and_history(input_str, system_prompt, retriever, chat_history_func, temperature=temperature)
     elif chat_history_func:
-        return generate_with_history(input_str, system_prompt, chat_history_func)
+        return generate_with_history(input_str, system_prompt, chat_history_func, temperature=temperature)
     elif retriever:
-        return generate_with_docs(input_str, system_prompt, retriever)
+        return generate_with_docs(input_str, system_prompt, retriever, temperature=temperature)
     else:
-        return generate_base(input_str, '' if system_prompt is None else system_prompt)
+        return generate_base(input_str, '' if system_prompt is None else system_prompt, temperature=temperature)
 
 
-def generate_base(input_str, system_prompt):
+def generate_base(input_str, system_prompt, temperature=0.7):
     prompt = ChatPromptTemplate.from_messages([("system", system_prompt),
                                                MessagesPlaceholder(variable_name="history"),
                                                ("human", "{input}")])
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=temperature)
     chain = LLMChain(prompt=prompt, llm=llm)
     message = chain.invoke({"input": input_str, "history": []})
     return message["text"].strip()
 
 
-def generate_with_docs(input_str, system_prompt, retriever):
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
+def generate_with_docs(input_str, system_prompt, retriever, temperature=0.7):
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=temperature)
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
     combine_docs_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)
     retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
@@ -44,11 +44,11 @@ def generate_with_docs(input_str, system_prompt, retriever):
     return message['answer'].strip()
 
 
-def generate_with_history(input_str, system_prompt, chat_history_func):
+def generate_with_history(input_str, system_prompt, chat_history_func, temperature=0.7):
     prompt = ChatPromptTemplate.from_messages([("system", system_prompt),
                                                MessagesPlaceholder(variable_name="history"),
                                                ("human", "{input}")])
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=temperature)
     chain = LLMChain(prompt=prompt, llm=llm)
     with_message_history = RunnableWithMessageHistory(chain, chat_history_func, input_messages_key='input',
                                                       history_messages_key='history', output_messages_key='text')
@@ -56,8 +56,8 @@ def generate_with_history(input_str, system_prompt, chat_history_func):
     return message['text'].strip()
 
 
-def generate_with_docs_and_history(input_str, system_prompt, retriever, chat_history_func):
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
+def generate_with_docs_and_history(input_str, system_prompt, retriever, chat_history_func, temperature=0.7):
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=temperature)
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
     combine_docs_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)
     retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
