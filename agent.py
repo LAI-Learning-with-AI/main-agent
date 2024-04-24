@@ -10,7 +10,7 @@ debug = True
 
 
 class Agent:
-    def __init__(self, name, description, memory_reflection_threshold=20):
+    def __init__(self, name, description):
         self.name = name
         self.description = description
 
@@ -18,6 +18,20 @@ class Agent:
         return f"Agent({self.name}, {self.description})"
 
     def respond_with_docs(self, prompt_meta, user_name, user_description, user_input, retriever, temperature=0.7):
+        """
+        Generates a response to the user input with Retrival Augmented Generation (RAG).
+
+        Parameters:
+        - prompt_meta (str): A formattable string used as a part of the system prompt.
+        - user_name (str): The name the user inputting text will be identified as.
+        - user_description (str): Unused parameter.
+        - user_input (str): The user input used in generation.
+        - retriever (obj): The retriever object used to fetch relevant information from the vector store.
+        - temperature (float, optional): Parameter controlling the randomness of the response generation. Defaults to 0.7.
+
+        Returns:
+        - str: The response generated based on the user input and additional information.
+        """
         now = datetime.now()
 
         prompt = f"You are {self.name}. {self.description} It is currently {now}. You are interacting with {user_name}. "
@@ -28,6 +42,21 @@ class Agent:
         return response
 
     def respond_with_docs_and_history(self, system_prompt, user_name, user_description, user_input, retriever, messages, temperature=0.7):
+        """
+        Generates a response to the user input with Retrival Augmented Generation (RAG) and chat history.
+
+        Parameters:
+        - system_prompt (str): A formattable string used as a part of the system prompt.
+        - user_name (str): The name the user inputting text will be identified as.
+        - user_description (str): Unused parameter.
+        - user_input (str): The user input used in generation.
+        - retriever (obj): The retriever object used to fetch relevant information from the vector store.
+        - messages (list): The chat history used in generation. Even indices are user messages and odd indices are AI responses.
+        - temperature (float, optional): Parameter controlling the randomness of the response generation. Defaults to 0.7.
+
+        Returns:
+        - str: The response generated based on the user input and additional information.
+        """
         prompt = f"You are {self.name}. {self.description} You are interacting with {user_name}. "
 
         # Build chat history

@@ -15,6 +15,19 @@ load_dotenv()
 
 
 def generate(input_str, system_prompt=None, chat_history_func=None, retriever=None, temperature=0.7):
+    """
+    A function that routes the text generation process based on the provided parameters.
+
+    Parameters:
+    - input_str: The input string to generate text from.
+    - system_prompt (str, optional): System prompt for text generation. Default is None.
+    - chat_history_func (func, optional): Function to provide chat history. Default is None.
+    - retriever (optional): Retriever for Retrival Augmented Generation (RAG). Default is None.
+    - temperature (float, optional): Parameter controlling the randomness of the response generation. Default is 0.7.
+
+    Returns:
+    - The generated text based on the input and optional parameters.
+    """
     if chat_history_func and retriever:
         return generate_with_docs_and_history(input_str, system_prompt, retriever, chat_history_func, temperature=temperature)
     elif chat_history_func:
@@ -26,6 +39,9 @@ def generate(input_str, system_prompt=None, chat_history_func=None, retriever=No
 
 
 def generate_base(input_str, system_prompt, temperature=0.7):
+    """
+    Internal Function, used by generate() function. You likely want to use generate() instead.
+    """
     prompt = ChatPromptTemplate.from_messages([("system", system_prompt),
                                                MessagesPlaceholder(variable_name="history"),
                                                ("human", "{input}")])
@@ -36,6 +52,9 @@ def generate_base(input_str, system_prompt, temperature=0.7):
 
 
 def generate_with_docs(input_str, system_prompt, retriever, temperature=0.7):
+    """
+    Internal Function, used by generate() function. You likely want to use generate() instead.
+    """
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=temperature)
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
     combine_docs_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)
@@ -45,6 +64,9 @@ def generate_with_docs(input_str, system_prompt, retriever, temperature=0.7):
 
 
 def generate_with_history(input_str, system_prompt, chat_history_func, temperature=0.7):
+    """
+    Internal Function, used by generate() function. You likely want to use generate() instead.
+    """
     prompt = ChatPromptTemplate.from_messages([("system", system_prompt),
                                                MessagesPlaceholder(variable_name="history"),
                                                ("human", "{input}")])
@@ -57,6 +79,9 @@ def generate_with_history(input_str, system_prompt, chat_history_func, temperatu
 
 
 def generate_with_docs_and_history(input_str, system_prompt, retriever, chat_history_func, temperature=0.7):
+    """
+    Internal Function, used by generate() function. You likely want to use generate() instead.
+    """
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=temperature)
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
     combine_docs_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)

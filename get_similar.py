@@ -11,6 +11,17 @@ else:
 
 # takes in string array
 def get_similar(topics: list[str], max_per_topic: int = 5) -> list:
+    """
+    Function to get similar documents from vector store given a list of topics.
+    Useful to find resources to learn more about a topic.
+
+    Parameters:
+    - topics (list[str]): String array of topics to search for similar documents.
+    - max_per_topic (int, optional): Maximum number of documents to return per topic. Defaults to 5.
+
+    Returns:
+    - list: List of dictionaries containing topic and list of similar documents.
+    """
     result = []
     vs = load_vectorstore(database="postgres", password=os.getenv("POSTGRESQL_PASSWORD"),
                           collection_name="corpus")
