@@ -67,19 +67,3 @@ def generate_with_docs_and_history(input_str, system_prompt, retriever, chat_his
                                           config={'configurable': {'session_id': 'test'}})
     return message['answer'].strip()
 
-
-def get_rating(x):
-    """
-    Extracts a rating from a string.
-
-    Args:
-    - x (str): The string to extract the rating from.
-
-    Returns:
-    - int: The rating extracted from the string, or None if no rating is found.
-    """
-    nums = [int(i) for i in re.findall(r'\d+', x)]
-    if len(nums) > 0:
-        return min(nums)
-    else:
-        return None
